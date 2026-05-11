@@ -1,0 +1,1478 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>100 дней AI — Программа обучения</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --black: #0a0a0a;
+  --white: #ffffff;
+  --gray-1: #f2f2f2;
+  --gray-2: #b0b0b0;
+  --gray-3: #444;
+  --accent: #d8fb03;
+  --green: #22c55e;
+  --card: #121212;
+  --border: #1e1e1e;
+  --border2: #2a2a2a;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { font-family: 'Space Grotesk', Arial, sans-serif; background: var(--black); color: var(--white); min-height: 100vh; }
+
+/* HEADER */
+.header {
+  padding: 18px 32px;
+  display: flex; justify-content: space-between; align-items: center;
+  border-bottom: 1px solid var(--border);
+  position: sticky; top: 0; background: var(--black); z-index: 200;
+  gap: 16px;
+}
+.logo { font-size: 13px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; white-space: nowrap; }
+.logo span { color: var(--accent); }
+.header-right { display: flex; align-items: center; gap: 20px; }
+.progress-wrap { display: flex; align-items: center; gap: 12px; }
+.progress-label { font-size: 12px; color: var(--gray-2); white-space: nowrap; }
+.progress-bar-wrap { width: 140px; height: 3px; background: #222; border-radius: 2px; }
+.progress-bar-fill { height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.4s; }
+.progress-count { font-size: 13px; font-weight: 600; color: var(--accent); white-space: nowrap; }
+.reset-btn { font-size: 11px; color: var(--gray-3); background: none; border: 1px solid #333; padding: 5px 12px; cursor: pointer; font-family: inherit; letter-spacing: 1px; text-transform: uppercase; transition: all 0.15s; }
+.reset-btn:hover { border-color: #666; color: var(--gray-2); }
+
+/* LAYOUT */
+.layout { display: flex; height: calc(100vh - 57px); }
+
+/* SIDEBAR */
+.sidebar {
+  width: 264px; flex-shrink: 0;
+  border-right: 1px solid var(--border);
+  overflow-y: auto; overflow-x: hidden;
+}
+.sidebar::-webkit-scrollbar { width: 4px; }
+.sidebar::-webkit-scrollbar-track { background: transparent; }
+.sidebar::-webkit-scrollbar-thumb { background: #333; border-radius: 2px; }
+
+.phase-group { border-bottom: 1px solid var(--border); }
+.phase-toggle {
+  padding: 14px 20px;
+  display: flex; justify-content: space-between; align-items: center;
+  cursor: pointer; transition: background 0.15s; user-select: none;
+}
+.phase-toggle:hover { background: #111; }
+.phase-toggle-left { display: flex; flex-direction: column; gap: 3px; }
+.phase-toggle-name { font-size: 12px; font-weight: 700; letter-spacing: 0.5px; }
+.phase-toggle-range { font-size: 10px; color: var(--gray-2); letter-spacing: 2px; text-transform: uppercase; }
+.phase-toggle-arrow { font-size: 10px; color: var(--gray-3); transition: transform 0.2s; }
+.phase-group.open .phase-toggle-arrow { transform: rotate(180deg); }
+.phase-mini-progress { display: flex; gap: 3px; margin-top: 6px; }
+.mini-dot { width: 6px; height: 6px; border-radius: 50%; background: #2a2a2a; transition: background 0.3s; }
+.mini-dot.done { background: var(--accent); }
+
+.lessons-nav { display: none; }
+.phase-group.open .lessons-nav { display: block; }
+.nav-item {
+  padding: 10px 20px 10px 28px;
+  cursor: pointer;
+  border-left: 2px solid transparent;
+  transition: all 0.15s;
+  display: flex; align-items: flex-start; gap: 10px;
+}
+.nav-item:hover { background: #0e0e0e; border-left-color: #333; }
+.nav-item.active { background: #111500; border-left-color: var(--accent); }
+.nav-check {
+  width: 16px; height: 16px; flex-shrink: 0; margin-top: 2px;
+  border: 1px solid #333; border-radius: 2px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 9px; transition: all 0.2s;
+}
+.nav-check.done { background: var(--green); border-color: var(--green); color: #fff; }
+.nav-text { flex: 1; }
+.nav-title { font-size: 12px; line-height: 1.4; }
+.nav-days { font-size: 10px; color: var(--gray-2); margin-top: 2px; }
+
+/* MAIN */
+.main { flex: 1; overflow-y: auto; overflow-x: hidden; }
+.main::-webkit-scrollbar { width: 6px; }
+.main::-webkit-scrollbar-track { background: transparent; }
+.main::-webkit-scrollbar-thumb { background: #222; border-radius: 3px; }
+
+/* WELCOME */
+.welcome-screen { max-width: 700px; margin: 0 auto; padding: 64px 48px; }
+.welcome-eyebrow { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--accent); margin-bottom: 20px; }
+.welcome-title { font-size: 48px; font-weight: 700; line-height: 1.1; margin-bottom: 20px; }
+.welcome-sub { font-size: 17px; color: var(--gray-2); line-height: 1.7; margin-bottom: 48px; }
+.welcome-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); margin-bottom: 48px; }
+.stat-box { background: var(--black); padding: 24px 20px; }
+.stat-num { font-size: 36px; font-weight: 700; color: var(--accent); }
+.stat-label { font-size: 12px; color: var(--gray-2); margin-top: 4px; }
+.welcome-phases { display: flex; flex-direction: column; gap: 8px; }
+.welcome-phase-card {
+  border: 1px solid var(--border2);
+  padding: 18px 24px;
+  display: flex; justify-content: space-between; align-items: center;
+  cursor: pointer; transition: all 0.15s;
+}
+.welcome-phase-card:hover { border-color: var(--accent); background: #0d0d00; }
+.wpc-left h3 { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
+.wpc-left p { font-size: 13px; color: var(--gray-2); }
+.wpc-right { display: flex; align-items: center; gap: 12px; }
+.wpc-days { font-size: 12px; color: var(--gray-2); white-space: nowrap; }
+.wpc-arrow { color: var(--accent); font-size: 18px; }
+
+/* LESSON DETAIL */
+.lesson-view { max-width: 760px; margin: 0 auto; padding: 48px 48px 80px; }
+.lesson-eyebrow {
+  display: flex; align-items: center; gap: 12px;
+  font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--accent);
+  margin-bottom: 16px;
+}
+.lesson-eyebrow-sep { color: #333; }
+.lesson-title { font-size: 38px; font-weight: 700; line-height: 1.15; margin-bottom: 20px; }
+.lesson-meta { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 40px; }
+.meta-badge {
+  background: #1a1a1a; border: 1px solid #2a2a2a;
+  padding: 5px 14px; font-size: 12px; color: var(--gray-2);
+  letter-spacing: 0.5px;
+}
+.meta-tool { background: #0d0d00; border: 1px solid #2a2a00; color: #aaa; }
+
+/* STEPS */
+.steps { display: flex; flex-direction: column; gap: 16px; margin-bottom: 40px; }
+.step-card { border: 1px solid var(--border2); position: relative; overflow: hidden; }
+.step-header { padding: 0 28px; display: flex; align-items: center; gap: 16px; height: 52px; border-bottom: 1px solid var(--border); }
+.step-num { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; padding: 4px 12px; }
+.step-1 .step-num { background: var(--accent); color: var(--black); }
+.step-2 .step-num { background: #fff; color: var(--black); }
+.step-3 .step-num { background: var(--green); color: #fff; }
+.step-title { font-size: 15px; font-weight: 600; }
+.step-body { padding: 24px 28px; font-size: 15px; color: var(--gray-2); line-height: 1.7; }
+.step-body strong { color: var(--white); font-weight: 600; }
+.step-body ul { padding-left: 20px; margin-top: 8px; }
+.step-body li { margin-bottom: 6px; }
+.step-body p + p { margin-top: 10px; }
+
+/* RESOURCES */
+.section-label { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--gray-2); margin-bottom: 16px; }
+.resources-block { border: 1px solid var(--border2); background: #0d0d0d; padding: 24px 28px; margin-bottom: 24px; }
+.resource-row { display: flex; align-items: flex-start; gap: 14px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+.resource-row:last-child { border-bottom: none; padding-bottom: 0; }
+.res-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+.res-info strong { font-size: 14px; font-weight: 600; display: block; margin-bottom: 2px; }
+.res-info span { font-size: 13px; color: var(--gray-2); }
+
+/* BLOG */
+.blog-block { border: 1px solid #2a2700; background: #0f0e00; padding: 24px 28px; margin-bottom: 40px; }
+.blog-eyebrow { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--accent); margin-bottom: 10px; }
+.blog-post-title { font-size: 20px; font-weight: 600; line-height: 1.4; }
+
+/* COMPLETE */
+.complete-wrap { display: flex; gap: 12px; }
+.btn-complete {
+  flex: 1; padding: 16px 32px;
+  background: var(--accent); color: var(--black);
+  border: none; font-family: inherit; font-size: 13px; font-weight: 700;
+  letter-spacing: 2px; text-transform: uppercase;
+  cursor: pointer; transition: all 0.15s;
+}
+.btn-complete:hover { background: #c8eb00; }
+.btn-complete.completed { background: var(--green); color: #fff; }
+.btn-complete.completed:hover { background: #1ab050; }
+.btn-prev, .btn-next {
+  padding: 16px 24px;
+  background: transparent; color: var(--gray-2);
+  border: 1px solid #333; font-family: inherit; font-size: 13px;
+  cursor: pointer; transition: all 0.15s; white-space: nowrap;
+}
+.btn-prev:hover, .btn-next:hover { border-color: #666; color: var(--white); }
+.btn-prev:disabled, .btn-next:disabled { opacity: 0.2; cursor: not-allowed; }
+
+/* MOBILE */
+.sidebar-toggle { display: none; background: #1a1a1a; border: 1px solid #333; color: var(--white); padding: 8px 16px; font-family: inherit; font-size: 12px; cursor: pointer; letter-spacing: 1px; text-transform: uppercase; }
+.mobile-sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 150; }
+.sidebar.mobile-open { display: flex !important; flex-direction: column; position: fixed; left: 0; top: 0; bottom: 0; z-index: 160; background: var(--black); width: 280px; }
+
+@media (max-width: 768px) {
+  .header { padding: 14px 20px; }
+  .header-right { gap: 12px; }
+  .progress-bar-wrap { width: 80px; }
+  .reset-btn { display: none; }
+  .layout { height: auto; flex-direction: column; }
+  .sidebar { display: none; width: 100%; height: auto; max-height: none; border-right: none; border-bottom: 1px solid var(--border); }
+  .main { overflow: visible; }
+  .welcome-screen { padding: 32px 20px; }
+  .welcome-title { font-size: 32px; }
+  .welcome-stats { grid-template-columns: repeat(3, 1fr); }
+  .stat-num { font-size: 28px; }
+  .lesson-view { padding: 32px 20px 60px; }
+  .lesson-title { font-size: 28px; }
+  .step-body { padding: 20px; }
+  .step-header { padding: 0 20px; }
+  .sidebar-toggle { display: block; margin: 12px 20px; }
+  .complete-wrap { flex-direction: column; }
+}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="logo">100 дней <span>AI</span></div>
+  <div class="header-right">
+    <div class="progress-wrap">
+      <span class="progress-label">Пройдено</span>
+      <div class="progress-bar-wrap"><div class="progress-bar-fill" id="headerProgress" style="width:0%"></div></div>
+      <span class="progress-count" id="headerCount">0 / 32</span>
+    </div>
+    <button class="reset-btn" onclick="resetProgress()">Сброс</button>
+  </div>
+</header>
+
+<div class="layout">
+  <aside class="sidebar" id="sidebar"></aside>
+  <main class="main" id="main"></main>
+</div>
+
+<script>
+const PHASES = [
+  {
+    id: 1,
+    name: "Основы и автоматизации",
+    days: "Дни 1–20",
+    tools: "Claude, ChatGPT, Make.com",
+    color: "#d8fb03"
+  },
+  {
+    id: 2,
+    name: "Telegram-боты и CRM",
+    days: "Дни 21–40",
+    tools: "Make.com, ManyChat, AmoCRM",
+    color: "#d8fb03"
+  },
+  {
+    id: 3,
+    name: "n8n и сложные сценарии",
+    days: "Дни 41–60",
+    tools: "n8n, Airtable, Notion, API",
+    color: "#d8fb03"
+  },
+  {
+    id: 4,
+    name: "AI-контент и визуал",
+    days: "Дни 61–80",
+    tools: "Midjourney, Runway, Kling, HeyGen",
+    color: "#d8fb03"
+  },
+  {
+    id: 5,
+    name: "Первые продажи и масштаб",
+    days: "Дни 81–100",
+    tools: "Всё вместе",
+    color: "#d8fb03"
+  }
+];
+
+const LESSONS = [
+  // PHASE 1
+  {
+    id: 1, phase: 1,
+    days: "1–2", title: "Промпт-инжиниринг",
+    tools: ["Claude", "ChatGPT"],
+    steps: [
+      {
+        label: "Изучи",
+        body: `<p>Промпт — это не просто вопрос, это <strong>техническое задание для AI</strong>. Качество ответа на 80% зависит от того, как ты спросил.</p>
+<p>Три главных принципа хорошего промпта:</p>
+<ul>
+<li><strong>Роль</strong> — скажи кто ты и кто AI: «Ты — опытный маркетолог»</li>
+<li><strong>Контекст</strong> — дай фон: «У меня кофейня в Москве, 50 мест»</li>
+<li><strong>Формат</strong> — скажи что хочешь получить: «Дай список из 5 пунктов»</li>
+</ul>`
+      },
+      {
+        label: "Сделай",
+        body: `<p>Открой Claude или ChatGPT и напиши один и тот же запрос тремя способами:</p>
+<ul>
+<li>Плохо: <strong>«Напиши текст для сайта»</strong></li>
+<li>Лучше: <strong>«Напиши текст для главной страницы кофейни»</strong></li>
+<li>Отлично: <strong>«Ты — копирайтер для малого бизнеса. Напиши короткий (3 предложения) текст для главной страницы уютной кофейни в центре Москвы. Тон — тёплый, без пафоса. Аудитория — офисные сотрудники 25–40 лет.»</strong></li>
+</ul>
+<p>Сравни результаты. Сохрани лучший промпт как шаблон.</p>`
+      },
+      {
+        label: "Результат",
+        body: `<p>У тебя есть <strong>личный шаблон промпта</strong> из трёх частей: роль + контекст + формат.</p>
+<p>Ты понимаешь разницу между «спросить» и «поставить задачу». Это основа всего что будет дальше.</p>`
+      }
+    ],
+    resources: [
+      { icon: "📖", title: "Документация Claude", desc: "Раздел Prompt Engineering на сайте Anthropic — бесплатно" },
+      { icon: "🎥", title: "YouTube: «Prompt Engineering Guide»", desc: "Ищи по запросу — много хороших бесплатных видео" },
+      { icon: "💬", title: "Практика", desc: "claude.ai или chatgpt.com — просто открой и пробуй" }
+    ],
+    blog: "День 1: оказывается, как ты спрашиваешь — так тебе и отвечают"
+  },
+  {
+    id: 2, phase: 1,
+    days: "3–4", title: "Claude для бизнеса",
+    tools: ["Claude"],
+    steps: [
+      {
+        label: "Изучи",
+        body: `<p>Claude отлично справляется с деловыми задачами: <strong>ответы на вопросы клиентов, шаблоны писем, анализ текстов, генерация идей</strong>.</p>
+<p>Ключевой приём — <strong>System Prompt</strong>: инструкция которую AI получает до разговора. Это превращает Claude в специализированного ассистента для твоего бизнеса.</p>`
+      },
+      {
+        label: "Сделай",
+        body: `<p>Возьми реальный список из 5–10 частых вопросов от клиентов (своих или знакомого бизнеса). Напиши для Claude системный промпт:</p>
+<ul>
+<li>«Ты — консультант компании [название]. Отвечаешь на вопросы клиентов кратко и по делу. Не придумывай факты.»</li>
+<li>Затем задай эти вопросы и посмотри на ответы</li>
+<li>Улучши промпт если нужно, добавь конкретики</li>
+</ul>
+<p>Задокументируй итоговый промпт — это уже готовый продукт.</p>`
+      },
+      {
+        label: "Результат",
+        body: `<p><strong>Готовый бот-консультант</strong> на базе Claude для конкретного бизнеса. Умеет отвечать на 5–10 частых вопросов клиентов.</p>
+<p>Пусть пока это только в интерфейсе Claude — завтра ты научишься это автоматизировать.</p>`
+      }
+    ],
+    resources: [
+      { icon: "📖", title: "System Prompts в Claude", desc: "Раздел «Build with Claude» на docs.anthropic.com" },
+      { icon: "💡", title: "Идея", desc: "Попроси знакомого владельца бизнеса дать список FAQ — это готовый кейс для портфолио" }
+    ],
+    blog: "Сделал бота-консультанта за 2 часа без кода"
+  },
+  {
+    id: 3, phase: 1,
+    days: "5–7", title: "Make.com — первые сценарии",
+    tools: ["Make.com"],
+    steps: [
+      {
+        label: "Изучи",
+        body: `<p>Make.com (бывший Integromat) — это визуальный конструктор автоматизации. Ты соединяешь приложения как лего-блоки.</p>
+<p>Три базовых понятия:</p>
+<ul>
+<li><strong>Сценарий</strong> — цепочка действий</li>
+<li><strong>Триггер</strong> — событие которое запускает сценарий (новая строка, письмо, заявка)</li>
+<li><strong>Модуль</strong> — одно действие (отправить письмо, добавить строку, послать уведомление)</li>
+</ul>`
+      },
+      {
+        label: "Сделай",
+        body: `<p><strong>День 5:</strong> Зарегистрируйся на make.com, изучи интерфейс. Посмотри готовые шаблоны.</p>
+<p><strong>День 6:</strong> Создай первый сценарий: <strong>Gmail → Google Sheets</strong>. Когда приходит письмо с темой «Заявка» — добавляй строку в таблицу. Бесплатные модули, работает сразу.</p>
+<p><strong>День 7:</strong> Запусти тест, отправь себе письмо. Убедись что строка появилась в таблице. Разберись с форматированием данных.</p>`
+      },
+      {
+        label: "Результат",
+        body: `<p><strong>Первый работающий автоматический сценарий.</strong> Письмо пришло — данные автоматически попали в таблицу.</p>
+<p>Ты понимаешь логику триггер → действие. Это шаблон для любой автоматизации.</p>`
+      }
+    ],
+    resources: [
+      { icon: "🌐", title: "make.com", desc: "Бесплатный план — 1000 операций/месяц, достаточно для старта" },
+      { icon: "🎥", title: "YouTube: «Make.com tutorial for beginners»", desc: "Официальный канал Make — русских субтитров нет, но интерфейс понятен визуально" },
+      { icon: "📚", title: "Make Academy", desc: "academy.make.com — бесплатные курсы от команды Make" }
+    ],
+    blog: "Make.com — это лего для бизнеса. Первый сценарий за вечер"
+  },
+  {
+    id: 4, phase: 1,
+    days: "8–10", title: "Make + Google Sheets",
+    tools: ["Make.com", "Google Sheets"],
+    steps: [
+      {
+        label: "Изучи",
+        body: `<p>Google Sheets — идеальная база данных для малого бизнеса на старте: бесплатно, понятно, работает как CRM.</p>
+<p>Make умеет: <strong>добавлять строки, обновлять ячейки, искать данные, читать таблицы</strong> — это основа большинства простых автоматизаций.</p>`
+      },
+      {
+        label: "Сделай",
+        body: `<p>Создай Google Form для сбора заявок (имя, телефон, вопрос). Подключи Make:</p>
+<ul>
+<li><strong>Триггер:</strong> Новый ответ в Google Forms</li>
+<li><strong>Действие 1:</strong> Записать данные в Google Sheets (лист «Заявки»)</li>
+<li><strong>Действие 2:</strong> Обновить ячейку «Статус» значением «Новая»</li>
+</ul>
+<p>Заполни форму тестово 3–5 раз. Проверь что все данные корректно попадают в таблицу.</p>`
+      },
+      {
+        label: "Результат",
+        body: `<p><strong>Система сбора заявок:</strong> форма → автоматически в таблицу. Ни одна заявка не потеряется.</p>
+<p>Это реальный продукт который стоит денег. Любой малый бизнес платит за это решение.</p>`
+      }
+    ],
+    resources: [
+      { icon: "📊", title: "Google Workspace", desc: "Forms + Sheets — бесплатно с аккаунтом Google" },
+      { icon: "💡", title: "Подсказка", desc: "В Make есть готовый шаблон «Google Forms → Sheets» — найди в Templates" }
+    ],
+    blog: "Теперь заявки сами падают в таблицу — без менеджера"
+  },
+  {
+    id: 5, phase: 1,
+    days: "11–13", title: "Make + Telegram-уведомления",
+    tools: ["Make.com", "Telegram"],
+    steps: [
+      {
+        label: "Изучи",
+        body: `<p>Telegram Bot API — один из самых простых способов получать мгновенные уведомления. Make умеет отправлять сообщения в Telegram через бота.</p>
+<p>Нужно сделать один раз: создать бота через @BotFather, получить токен, узнать свой chat_id. Потом это будет работать вечно.</p>`
+      },
+      {
+        label: "Сделай",
+        body: `<p><strong>День 11:</strong> Создай Telegram-бота через @BotFather. Получи токен. Напиши боту сообщение и узнай свой chat_id через @userinfobot.</p>
+<p><strong>День 12:</strong> Добавь в сценарий из прошлого урока ещё одно действие — Telegram: Send a Message. Настрой: при новой заявке ты получаешь сообщение с именем и телефоном клиента.</p>
+<p><strong>День 13:</strong> Кастомизируй формат сообщения. Добавь эмодзи, структуру. Протестируй.</p>`
+      },
+      {
+        label: "Результат",
+        body: `<p><strong>Мгновенные уведомления:</strong> клиент заполнил форму — через 3 секунды ты знаешь об этом.</p>
+<p>Цепочка: форма → таблица → уведомление в Telegram. Три шага, ноль кода.</p>`
+      }
+    ],
+    resources: [
+      { icon: "🤖", title: "@BotFather в Telegram", desc: "Создание бота — бесплатно, занимает 2 минуты" },
+      { icon: "📖", title: "Telegram Bot API", desc: "core.telegram.org/bots — документация если нужны детали" }
+    ],
+    blog: "Клиент оставил заявку — я узнал через 3 секунды. Вот как это работает"
+  },
+  {
+    id: 6, phase: 1,
+    days: "14–16", title: "Make + Email-автоответы",
+    tools: ["Make.com", "Gmail", "SMTP"],
+    steps: [
+      {
+        label: "Изучи",
+        body: `<p>Автоответ клиенту — это <strong>первое касание после заявки</strong>. 90% малого бизнеса его не делает. Клиент оставил заявку и не знает — дошла ли она, ждать ли звонка.</p>
+<p>Хороший автоответ: подтверждает получение, устанавливает ожидания («перезвоним в течение часа»), создаёт доверие.</p>`
+      },
+      {
+        label: "Сделай",
+        body: `<p>Добавь в свою цепочку ещё один шаг — отправка письма клиенту:</p>
+<ul>
+<li><strong>Gmail Send Email</strong> или SMTP модуль</li>
+<li>Тема: «Ваша заявка получена»</li>
+<li>Тело: персонализированное — используй имя из формы</li>
+<li>Напиши с помощью Claude хороший текст автоответа под конкретный бизнес</li>
+</ul>
+<p>Итоговая цепочка: заявка → таблица → Telegram → письмо клиенту.</p>`
+      },
+      {
+        label: "Результат",
+        body: `<p><strong>Первая автоматическая воронка</strong> полностью готова: сбор → хранение → уведомление → подтверждение клиенту.</p>
+<p>Это продукт который можно продавать уже сейчас. Стоимость внедрения для бизнеса: 15 000–30 000 руб.</p>`
+      }
+    ],
+    resources: [
+      { icon: "✉️", title: "Gmail в Make", desc: "Модуль Gmail — бесплатно, работает с любым Google аккаунтом" },
+      { icon: "💡", title: "Совет", desc: "Попроси Claude написать 3 варианта текста автоответа — выбери лучший" }
+    ],
+    blog: "Первая автоматическая воронка готова — показываю схему"
+  },
+  {
+    id: 7, phase: 1,
+    days: "17–20", title: "Первый мини-продукт",
+    tools: ["Make.com", "Claude", "Google Sheets"],
+    steps: [
+      {
+        label: "Изучи",
+        body: `<p>Продукт — это не просто «я умею делать», а <strong>упакованное решение конкретной проблемы за фиксированную цену</strong>.</p>
+<p>Твой первый продукт: «Система обработки заявок для малого бизнеса» — форма + таблица + уведомление + письмо. Решает реальную боль: потеря лидов, медленная реакция, нет учёта.</p>`
+      },
+      {
+        label: "Сделай",
+        body: `<p><strong>Дни 17–18:</strong> Перебери и отшлифуй всё что сделал. Убедись что работает стабильно. Добавь обработку ошибок в Make (Error handlers).</p>
+<p><strong>День 19:</strong> Опиши продукт в одном документе: что входит, что получает клиент, сколько стоит, за сколько времени делается.</p>
+<p><strong>День 20:</strong> Напиши пост в блог с демонстрацией — сделай скрин схемы Make, покажи как работает.</p>`
+      },
+      {
+        label: "Результат",
+        body: `<p><strong>Первый упакованный продукт</strong> с описанием и ценой. Готов к продаже.</p>
+<p>20 дней — от нуля до первого продукта. Это и есть вайбкодинг в действии.</p>`
+      }
+    ],
+    resources: [
+      { icon: "📝", title: "Шаблон описания продукта", desc: "Попроси Claude помочь написать описание — дай ему схему что ты сделал" },
+      { icon: "💡", title: "Цена старта", desc: "15 000–25 000 руб за установку + 3 000 руб/мес поддержка — реальный рынок" }
+    ],
+    blog: "Мой первый продукт за 20 дней — показываю что внутри и сколько стоит"
+  },
+
+  // PHASE 2
+  {
+    id: 8, phase: 2,
+    days: "21–23", title: "Telegram-бот без кода",
+    tools: ["Make.com", "ManyChat"],
+    steps: [
+      {
+        label: "Изучи",
+        body: `<p>Telegram-бот — это не просто уведомления. Это <strong>интерактивный диалог</strong>: кнопки, вопросы, сбор данных, ответы на команды.</p>
+<p>Два подхода: <strong>Make.com</strong> (гибко, любая логика) или <strong>ManyChat</strong> (проще, визуально, быстрее для простых сценариев). Начни с Make — понимаешь механику.</p>`
+      },
+      {
+        label: "Сделай",
+        body: `<p>Создай бота который:</p>
+<ul>
+<li>Приветствует новых пользователей</li>
+<li>Показывает inline-кнопки: «Узнать цены», «Оставить заявку», «Контакты»</li>
+<li>По кнопке «Оставить заявку» — просит имя и телефон</li>
+<li>Сохраняет данные в Google Sheets</li>
+</ul>
+<p>Используй модуль Telegram Bot в Make. Webhook принимает сообщения, сценарий обрабатывает их.</p>`
+      },
+      {
+        label: "Результат",
+        body: `<p><strong>Рабочий Telegram-бот</strong> с кнопками и сбором заявок. Подходит для любого малого бизнеса как первая точка контакта.</p>`
+      }
+    ],
+    resources: [
+      { icon: "🤖", title: "ManyChat", desc: "manychat.com — бесплатный план есть, хорош для визуального конструктора" },
+      { icon: "📖", title: "Telegram Bot API Docs", desc: "Inline keyboards, webhooks — core.telegram.org/bots/api" }
+    ],
+    blog: "Сделал Telegram-бота для малого бизнеса за вечер — без кода"
+  },
+  {
+    id: 9, phase: 2,
+    days: "24–26", title: "Бот + квалификация лидов",
+    tools: ["Make.com", "Claude API"],
+    steps: [
+      {
+        label: "Изучи",
+        body: `<p><strong>Квалификация лида</strong> — это выяснение: стоит ли тратить на него время менеджера. Бот может сделать это до первого звонка.</p>
+<p>Классические вопросы: бюджет, срочность, лицо принимающее решение, масштаб задачи. Бот задаёт их и сегментирует ответы.</p>`
+      },
+      {
+        label: "Сделай",
+        body: `<p>Добавь в бота цепочку квалификации:</p>
+<ul>
+<li>Вопрос 1: «Какой у вас бюджет?» — кнопки: до 30к / 30–100к / больше 100к</li>
+<li>Вопрос 2: «Когда нужно запустить?» — кнопки: срочно / в течение месяца / просто изучаю</li>
+<li>В зависимости от ответов — разные финальные действия (уведомить менеджера / отправить в воронку прогрева)</li>
+</ul>
+<p>Результат сохраняй в таблицу с тегом сегмента.</p>`
+      },
+      {
+        label: "Результат",
+        body: `<p><strong>Бот-квалификатор</strong>: автоматически сортирует лиды по горячести. Горячие — сразу к менеджеру. Холодные — в прогрев.</p>
+<p>Это заменяет первый звонок менеджера и экономит 2–3 часа в день для активного бизнеса.</p>`
+      }
+    ],
+    resources: [
+      { icon: "💡", title: "Совет", desc: "Попроси Claude придумать 5 квалификационных вопросов для конкретной ниши" },
+      { icon: "📊", title: "Матрица квалификации BANT", desc: "Budget, Authority, Need, Timeline — классическая методология продаж" }
+    ],
+    blog: "Этот бот заменяет первый звонок менеджера. Показываю логику"
+  },
+  {
+    id: 10, phase: 2,
+    days: "27–29", title: "CRM-автоматизация",
+    tools: ["Make.com", "AmoCRM", "Bitrix24"],
+    steps: [
+      {
+        label: "Изучи",
+        body: `<p>CRM (Customer Relationship Management) — система учёта клиентов и сделок. <strong>AmoCRM</strong> — проще, лучше для продаж. <strong>Bitrix24</strong> — мощнее, сложнее, есть бесплатный план.</p>
+<p>Make умеет автоматически создавать контакты и сделки в обеих системах — это главная ценность интеграции.</p>`
+      },
+      {
+        label: "Сделай",
+        body: `<p>Подключи CRM к своей цепочке:</p>
+<ul>
+<li>Зарегистрируйся в Bitrix24 (бесплатно) или AmoCRM (триал)</li>
+<li>В Make добавь модуль: при новой заявке → создать контакт в CRM → создать сделку → присвоить ответственного</li>
+<li>Настрой статусы: Новая → В работе → Закрыта</li>
+</ul>
+<p>Теперь каждая заявка = сделка в CRM автоматически.</p>`
+      },
+      {
+        label: "Результат",
+        body: `<p><strong>Автоматическое попадание лидов в CRM</strong> без ручного ввода. Менеджер видит задачи — не нужно напоминать что надо позвонить.</p>`
+      }
+    ],
+    resources: [
+      { icon: "🌐", title: "Bitrix24", desc: "bitrix24.ru — бесплатный план до 5 пользователей" },
+      { icon: "🌐", title: "AmoCRM", desc: "amocrm.ru — 14 дней бесплатно, потом от 499 руб/мес" }
+    ],
+    blog: "Автоматизировал то что раньше делал руками — лиды сами в CRM"
+  },
+  {
+    id: 11, phase: 2,
+    days: "30–32", title: "Полная воронка продаж",
+    tools: ["Make.com", "Telegram", "CRM", "Gmail"],
+    steps: [
+      {
+        label: "Изучи",
+        body: `<p>Воронка продаж на автопилоте: каждый этап отрабатывается автоматически. Менеджер включается только на ключевых точках — переговоры и закрытие.</p>
+<p>Классическая структура: <strong>Лид → Квалификация → Первый контакт → Напоминание → Закрытие</strong>.</p>`
+      },
+      {
+        label: "Сделай",
+        body: `<p>Собери полную цепочку из всего что изучил:</p>
+<ul>
+<li>Заявка через форму или бота → CRM + Telegram</li>
+<li>Если лид горячий → сразу уведомление менеджеру</li>
+<li>Если холодный → письмо с полезным контентом через 1 день</li>
+<li>Через 3 дня без ответа → напоминание в Telegram менеджеру</li>
+</ul>
+<p>Используй фильтры в Make для разветвления логики.</p>`
+      },
+      {
+        label: "Результат",
+        body: `<p><strong>Полная воронка продаж на автопилоте.</strong> Ни один лид не потеряется, ни одно напоминание не забудется.</p>
+<p>Это готовый продукт стоимостью 40 000–80 000 руб для среднего бизнеса.</p>`
+      }
+    ],
+    resources: [
+      { icon: "💡", title: "Фильтры в Make", desc: "Вкладка Filter в соединении модулей — задаёт условия разветвления" }
+    ],
+    blog: "Полная воронка продаж на автопилоте — лид → сделка без людей"
+  },
+  {
+    id: 12, phase: 2,
+    days: "33–35", title: "Кейс для реального бизнеса",
+    tools: ["Make.com", "Telegram"],
+    steps: [
+      {
+        label: "Изучи",
+        body: `<p><strong>Кейс</strong> — это не «я умею», а «я решил конкретную проблему конкретного бизнеса и вот результат в цифрах».</p>
+<p>Для портфолио нужен хотя бы один реальный кейс. Возьми знакомый бизнес — кофейня, салон, агентство — и разбери их процесс публично.</p>`
+      },
+      {
+        label: "Сделай",
+        body: `<p>Выбери нишу (например, кофейня или парикмахерская). Опиши их типичный болезненный процесс:</p>
+<ul>
+<li>Как сейчас принимают заявки? (WhatsApp вручную)</li>
+<li>Где теряют клиентов? (не перезвонили)</li>
+<li>Нарисуй схему «как есть» и «как будет» с твоей автоматизацией</li>
+</ul>
+<p>Это может быть гипотетический кейс — важна логика и демонстрация решения.</p>`
+      },
+      {
+        label: "Результат",
+        body: `<p><strong>Разобранный кейс для конкретной ниши</strong>: схема Make, описание проблемы и решения. Это первый материал для портфолио.</p>`
+      }
+    ],
+    resources: [
+      { icon: "💡", title: "Идея", desc: "Разбор кофейни — универсальная ниша: запись, заказы, доставка, лояльность" }
+    ],
+    blog: "Разобрал автоматизацию для кофейни — показываю схему бесплатно"
+  },
+  {
+    id: 13, phase: 2,
+    days: "36–40", title: "Первый клиентский проект",
+    tools: ["Make.com", "Telegram", "CRM"],
+    steps: [
+      {
+        label: "Изучи",
+        body: `<p>Первый проект делай бесплатно — это не альтруизм, это <strong>инвестиция в кейс и рекомендации</strong>. Главное правило: зафиксируй результат в цифрах до и после.</p>
+<p>Список из 5 знакомых предпринимателей → выбери у кого самая простая и понятная боль → предложи решить бесплатно.</p>`
+      },
+      {
+        label: "Сделай",
+        body: `<p><strong>Дни 36–37:</strong> Найди клиента. Проведи разговор: что болит, как сейчас работает.</p>
+<p><strong>Дни 38–39:</strong> Внедри автоматизацию. Не усложняй — сделай то что работает.</p>
+<p><strong>День 40:</strong> Получи обратную связь. Попроси разрешение написать кейс. Сделай фото/скрин результата.</p>`
+      },
+      {
+        label: "Результат",
+        body: `<p><strong>Первый реальный клиент.</strong> Кейс с конкретным результатом. Рекомендация или отзыв.</p>
+<p>День 40 — поворотная точка. Ты больше не учишься на примерах — ты делаешь реальные проекты.</p>`
+      }
+    ],
+    resources: [
+      { icon: "📝", title: "Шаблон брифа", desc: "Попроси Claude составить список вопросов для первой встречи с клиентом" }
+    ],
+    blog: "День 40: первый реальный клиент. Честно о том как это было"
+  },
+
+  // PHASE 3
+  {
+    id: 14, phase: 3,
+    days: "41–43", title: "n8n — установка и первые сценарии",
+    tools: ["n8n", "Docker"],
+    steps: [
+      {
+        label: "Изучи",
+        body: `<p>n8n (произносится «n-eight-n») — опенсорсный аналог Make.com. <strong>Главное отличие: self-hosted</strong> (сам хостишь) или облако n8n. Без лимитов на операции, больше гибкости, бесплатно при self-hosting.</p>
+<p>Минус: нужно немного технической уверенности для установки. Но с AI помощником — это реально.</p>`
+      },
+      {
+        label: "Сделай",
+        body: `<p><strong>Вариант А (простой):</strong> Зарегистрируйся на n8n.io Cloud — 14 дней бесплатно, потом $20/мес.</p>
+<p><strong>Вариант Б (бесплатный):</strong> Установи локально через Docker:</p>
+<ul>
+<li>Установи Docker Desktop</li>
+<li>Запусти: <code>docker run -it --rm --name n8n -p 5678:5678 -v ~/.n8n:/home/node/.n8n docker.n8n.io/n8nio/n8n</code></li>
+<li>Открой localhost:5678</li>
+</ul>
+<p>Воссоздай один из Make-сценариев в n8n. Сравни интерфейс.</p>`
+      },
+      {
+        label: "Результат",
+        body: `<p><strong>n8n запущен и работает.</strong> Ты понимаешь разницу с Make. Знаешь когда использовать что: Make — быстрее старт, n8n — дешевле при масштабе.</p>`
+      }
+    ],
+    resources: [
+      { icon: "🌐", title: "n8n.io", desc: "Официальный сайт. Docs.n8n.io — отличная документация" },
+      { icon: "🐳", title: "Docker Desktop", desc: "docker.com/products/docker-desktop — бесплатно для личного использования" },
+      { icon: "🎥", title: "YouTube: «n8n tutorial»", desc: "Официальный канал n8n — хорошие туториалы на английском" }
+    ],
+    blog: "n8n vs Make — в чём разница и когда что выбрать"
+  },
+  {
+    id: 15, phase: 3,
+    days: "44–46", title: "n8n + AI (Claude API)",
+    tools: ["n8n", "Claude API"],
+    steps: [
+      {
+        label: "Изучи",
+        body: `<p>Claude API позволяет встроить AI прямо в автоматизацию. n8n имеет встроенный HTTP Request модуль для любого API.</p>
+<p>Применения: автоматическая классификация входящих сообщений, генерация ответов, резюмирование текстов, перевод, извлечение данных из неструктурированного текста.</p>`
+      },
+      {
+        label: "Сделай",
+        body: `<p>Получи API ключ на console.anthropic.com (нужна карта, есть бесплатные кредиты на старт).</p>
+<p>Создай сценарий в n8n:</p>
+<ul>
+<li>Триггер: новое сообщение в Telegram</li>
+<li>HTTP Request → Claude API: отправь текст сообщения, попроси классифицировать («вопрос о цене / жалоба / запрос о продукте»)</li>
+<li>В зависимости от классификации — разные действия</li>
+</ul>`
+      },
+      {
+        label: "Результат",
+        body: `<p><strong>AI-маршрутизатор входящих сообщений.</strong> Система сама понимает о чём пишет клиент и направляет в нужный поток.</p>
+<p>Это уже серьёзный продукт для среднего бизнеса.</p>`
+      }
+    ],
+    resources: [
+      { icon: "🔑", title: "Anthropic Console", desc: "console.anthropic.com — API ключи, документация, биллинг" },
+      { icon: "📖", title: "Claude API Docs", desc: "docs.anthropic.com — Messages API, модели, цены" }
+    ],
+    blog: "ИИ теперь обрабатывает входящие запросы автоматически — показываю схему"
+  },
+  {
+    id: 16, phase: 3,
+    days: "47–49", title: "Airtable как база клиентов",
+    tools: ["n8n", "Airtable"],
+    steps: [
+      {
+        label: "Изучи",
+        body: `<p>Airtable — это база данных с интерфейсом Excel. Лучше Google Sheets для CRM: есть типы данных, связи между таблицами, представления (канбан, галерея, календарь).</p>
+<p>Для малого бизнеса без сложной CRM — Airtable идеален. Бесплатный план достаточен на старте.</p>`
+      },
+      {
+        label: "Сделай",
+        body: `<p>Создай базу клиентов в Airtable:</p>
+<ul>
+<li>Таблица Contacts: Имя, Телефон, Email, Источник, Статус</li>
+<li>Таблица Deals: Клиент (link), Сумма, Этап, Дата</li>
+<li>Подключи n8n: новая заявка → запись в Airtable</li>
+<li>Настрой представление Kanban по полю «Этап»</li>
+</ul>`
+      },
+      {
+        label: "Результат",
+        body: `<p><strong>Простая CRM на базе Airtable</strong> с автоматическим пополнением из всех источников лидов.</p>
+<p>Визуальная канбан-доска — понятна любому менеджеру без обучения.</p>`
+      }
+    ],
+    resources: [
+      { icon: "🌐", title: "Airtable", desc: "airtable.com — бесплатный план: до 1200 записей, неограниченные базы" },
+      { icon: "📖", title: "Airtable API", desc: "airtable.com/developers — для подключения через n8n" }
+    ],
+    blog: "Почему малому бизнесу не нужна сложная CRM — и что использовать вместо неё"
+  },
+  {
+    id: 17, phase: 3,
+    days: "50–52", title: "Парсинг и мониторинг",
+    tools: ["n8n", "Make.com", "RSS"],
+    steps: [
+      {
+        label: "Изучи",
+        body: `<p><strong>Парсинг</strong> — автоматический сбор данных с сайтов. <strong>Мониторинг</strong> — отслеживание изменений.</p>
+<p>Что можно мониторить: цены конкурентов, вакансии, отзывы о компании, курсы валют, новости по ключевым словам, изменения на конкретных сайтах.</p>`
+      },
+      {
+        label: "Сделай",
+        body: `<p>Три сценария на выбор:</p>
+<ul>
+<li><strong>RSS-мониторинг:</strong> подпишись на RSS конкурентов → уведомление в Telegram при новом посте</li>
+<li><strong>Мониторинг цен:</strong> Make HTTP Get → парсинг страницы → сравнение с прошлым значением → уведомление</li>
+<li><strong>Отзывы:</strong> Google Alerts → RSS → Telegram</li>
+</ul>
+<p>Сделай хотя бы один, задокументируй.</p>`
+      },
+      {
+        label: "Результат",
+        body: `<p><strong>Автоматическая разведка:</strong> ты знаешь что делают конкуренты без ручного мониторинга.</p>
+<p>Это отдельный мини-продукт — «Мониторинг конкурентов» за 10 000–15 000 руб/мес.</p>`
+      }
+    ],
+    resources: [
+      { icon: "💡", title: "Apify", desc: "apify.com — платформа для парсинга, есть бесплатные акторы" },
+      { icon: "📡", title: "RSS через Google", desc: "alerts.google.com — настрой алерты на ключевые слова, получи RSS" }
+    ],
+    blog: "Слежу за конкурентами автоматически — показываю как настроить за час"
+  },
+  {
+    id: 18, phase: 3,
+    days: "53–55", title: "Webhook и API",
+    tools: ["n8n", "Postman"],
+    steps: [
+      {
+        label: "Изучи",
+        body: `<p><strong>API</strong> (Application Programming Interface) — способ общения приложений друг с другом. Это как розетка: стандартный разъём через который подключаются сервисы.</p>
+<p><strong>Webhook</strong> — API наоборот. Обычно ты запрашиваешь данные (GET). Webhook — сервис сам присылает тебе данные когда что-то случилось (push).</p>`
+      },
+      {
+        label: "Сделай",
+        body: `<p><strong>Практика 1:</strong> Зарегистрируйся на reqbin.com или используй Postman. Сделай GET-запрос к публичному API (например, api.exchangerate-api.com — курсы валют). Разберись с JSON-ответом.</p>
+<p><strong>Практика 2:</strong> Создай Webhook в n8n, получи URL. Отправь POST-запрос с тестовыми данными. Посмотри как n8n получает и обрабатывает данные.</p>`
+      },
+      {
+        label: "Результат",
+        body: `<p>Ты понимаешь как работают API и webhook. Можешь подключить любой сервис у которого есть API — а это 99% современных сервисов.</p>`
+      }
+    ],
+    resources: [
+      { icon: "🔧", title: "Postman", desc: "postman.com — бесплатный инструмент для тестирования API" },
+      { icon: "📖", title: "Статья «API простыми словами»", desc: "Ищи на Habr или Medium — много хороших объяснений на русском" }
+    ],
+    blog: "API простыми словами — для предпринимателей которые не программисты"
+  },
+  {
+    id: 19, phase: 3,
+    days: "56–60", title: "Сложный продукт — лид до сделки с AI",
+    tools: ["n8n", "Claude API", "Airtable", "Telegram"],
+    steps: [
+      {
+        label: "Изучи",
+        body: `<p>Пора собрать всё вместе в один сложный но элегантный продукт. Это будет флагман твоего портфолио на ближайшие месяцы.</p>
+<p>Архитектура: <strong>входящий лид → AI-квалификация → сегментация → CRM → персонализированный ответ → напоминания</strong>.</p>`
+      },
+      {
+        label: "Сделай",
+        body: `<p>Собери в n8n полную систему:</p>
+<ul>
+<li>Webhook получает лид (из формы, бота, сайта)</li>
+<li>Claude API анализирует текст заявки и определяет: горячесть, тип клиента, основную потребность</li>
+<li>На основе анализа — создаёт персонализированный ответ клиенту</li>
+<li>Записывает в Airtable с тегами сегментации</li>
+<li>Уведомляет менеджера с кратким резюме от AI</li>
+</ul>`
+      },
+      {
+        label: "Результат",
+        body: `<p><strong>Система стоимостью 50 000–80 000 руб.</strong> Готова к продаже реальному бизнесу. Это твой главный кейс для следующих 40 дней.</p>`
+      }
+    ],
+    resources: [
+      { icon: "💡", title: "Архитектурный совет", desc: "Нарисуй схему в draw.io или Miro перед тем как начать кодить в n8n" }
+    ],
+    blog: "День 60: собрал продукт который стоит ₽50 000. Показываю что внутри"
+  },
+
+  // PHASE 4
+  {
+    id: 20, phase: 4,
+    days: "61–63", title: "Midjourney — основы",
+    tools: ["Midjourney", "Discord"],
+    steps: [
+      {
+        label: "Изучи",
+        body: `<p>Midjourney — лидер в AI-генерации изображений. Работает через Discord. Качество фотореалистичных изображений лучше чем у большинства конкурентов.</p>
+<p>Ключевые параметры: <strong>--ar</strong> (соотношение сторон), <strong>--style</strong> (стиль), <strong>--v 6.1</strong> (версия модели). Промпт на английском даёт лучшие результаты.</p>`
+      },
+      {
+        label: "Сделай",
+        body: `<p>Подпишись на Midjourney (от $10/мес). Зайди в Discord, канал #general.</p>
+<p>Сгенерируй 10–15 изображений для конкретного бизнеса (выбери нишу: кофейня, ресторан, бутик):</p>
+<ul>
+<li>Блюда / продукты на красивом фоне</li>
+<li>Интерьер заведения</li>
+<li>Модели с продуктом</li>
+</ul>
+<p>Сравни 3–4 варианта промпта. Найди формулу которая даёт стабильный результат.</p>`
+      },
+      {
+        label: "Результат",
+        body: `<p>30+ готовых AI-фото для конкретной ниши. Ты понимаешь как формулировать промпты для стабильного визуала. Себестоимость одного фото — <strong>$0.01</strong>.</p>`
+      }
+    ],
+    resources: [
+      { icon: "🎨", title: "midjourney.com", desc: "Подписка от $10/мес, есть бесплатный пробный период" },
+      { icon: "📖", title: "Midjourney Docs", desc: "docs.midjourney.com — параметры, стили, примеры промптов" }
+    ],
+    blog: "Сделал 30 фото для кафе без фотографа — показываю как и сколько стоит"
+  },
+  {
+    id: 21, phase: 4,
+    days: "64–66", title: "Визуальный стиль бренда в Midjourney",
+    tools: ["Midjourney", "Claude"],
+    steps: [
+      {
+        label: "Изучи",
+        body: `<p><strong>Brand consistency</strong> — все фото бренда должны выглядеть как единая серия. Достигается через <strong>Style Reference (--sref)</strong> и точно сформулированный стилевой промпт.</p>
+<p>Формула: <em>тип контента + стиль съёмки + освещение + цветовая палитра + атмосфера + --ar --style</em></p>`
+      },
+      {
+        label: "Сделай",
+        body: `<p>Возьми один бренд и создай для него <strong>стилевой промпт</strong>:</p>
+<ul>
+<li>Опиши визуальный код бренда (пример: «тёмный нуар, золотые акценты, свечное освещение, дорого»)</li>
+<li>Сгенерируй 5 фото используя этот промпт — они должны читаться как серия</li>
+<li>Сохрани промпт как шаблон для этого бренда</li>
+</ul>
+<p>Повтори для 2–3 разных ниш. У тебя будет библиотека стилевых шаблонов.</p>`
+      },
+      {
+        label: "Результат",
+        body: `<p><strong>Библиотека стилевых промптов</strong> для 3 ниш. Любой клиент из этих ниш получит фото в едином стиле за часы, а не дни.</p>`
+      }
+    ],
+    resources: [
+      { icon: "💡", title: "Совет", desc: "Попроси Claude описать визуальный код известного бренда — получишь готовый промпт" },
+      { icon: "🎨", title: "Style Reference --sref", desc: "Используй существующие изображения как стилевой референс" }
+    ],
+    blog: "Как дать бизнесу единый стиль фото за 1 день с помощью AI"
+  },
+  {
+    id: 22, phase: 4,
+    days: "67–69", title: "Runway и Kling — видео из фото",
+    tools: ["Runway", "Kling AI"],
+    steps: [
+      {
+        label: "Изучи",
+        body: `<p><strong>Runway Gen-3</strong> и <strong>Kling AI</strong> превращают статичные изображения в короткие видео. 3–5 секунд движения, которые оживляют контент в сторис и рилсах.</p>
+<p>Runway — больше творческого контроля, дороже. Kling — дешевле, хорошее качество для коммерческого контента.</p>`
+      },
+      {
+        label: "Сделай",
+        body: `<p>Возьми 5 лучших фото из предыдущего урока.</p>
+<ul>
+<li><strong>Runway:</strong> Загрузи фото, опиши движение промптом: «gentle steam rising from coffee cup, warm morning light»</li>
+<li><strong>Kling:</strong> Попробуй то же фото — сравни результаты</li>
+<li>Создай 10 коротких видео (3–5 сек каждое)</li>
+</ul>
+<p>Это готовый контент для 2 недель сторис.</p>`
+      },
+      {
+        label: "Результат",
+        body: `<p>10 коротких видео-клипов из AI-фото. Стоимость производства — <strong>$5–15</strong> вместо дня работы видеографа.</p>`
+      }
+    ],
+    resources: [
+      { icon: "🎬", title: "Runway", desc: "runwayml.com — $15/мес базовый план, 125 кредитов" },
+      { icon: "🎬", title: "Kling AI", desc: "klingai.com — дешевле Runway, хорошо для коммерческого использования" }
+    ],
+    blog: "Статичное фото → видео за 5 минут. Сколько это стоит реально"
+  },
+  {
+    id: 23, phase: 4,
+    days: "70–72", title: "HeyGen — AI-аватар и видеопрезентации",
+    tools: ["HeyGen"],
+    steps: [
+      {
+        label: "Изучи",
+        body: `<p>HeyGen создаёт видео где AI-аватар озвучивает твой текст. Выглядит как реальный человек. Идеально для: видеопрезентации услуг, обучающих видео, персонализированных писем клиентам.</p>
+<p>Можно создать своего цифрового клона — 2 минуты видео на камеру, потом аватар говорит любой текст твоим голосом.</p>`
+      },
+      {
+        label: "Сделай",
+        body: `<p>Зарегистрируйся на HeyGen, есть бесплатные видео для теста.</p>
+<ul>
+<li>Выбери стоковый аватар (или создай свой)</li>
+<li>Напиши скрипт презентации услуги (60–90 секунд) — помоги себе с Claude</li>
+<li>Сгенерируй видео</li>
+<li>Добавь субтитры, логотип, CTA в финале</li>
+</ul>`
+      },
+      {
+        label: "Результат",
+        body: `<p><strong>Готовая видеопрезентация</strong> без камеры, оператора и монтажёра. Стоимость производства — $10–20 вместо 50 000+ руб за студийное видео.</p>`
+      }
+    ],
+    resources: [
+      { icon: "🎥", title: "HeyGen", desc: "heygen.com — 1 бесплатное видео до 1 минуты для теста" },
+      { icon: "💡", title: "Совет", desc: "Создание собственного аватара — от $29/мес, стоит если делаешь много видео" }
+    ],
+    blog: "Создал видеопрезентацию без камеры и оператора — показываю результат"
+  },
+  {
+    id: 24, phase: 4,
+    days: "73–75", title: "Автоматизация контент-производства",
+    tools: ["Make.com", "Midjourney API", "Telegram"],
+    steps: [
+      {
+        label: "Изучи",
+        body: `<p>Контент-завод — это система где <strong>человек задаёт бриф, а машина производит контент</strong>. Минимум ручного труда, максимум объёма.</p>
+<p>Архитектура: форма с брифом → Claude пишет промпты → Midjourney генерирует фото → автоматическая публикация или отправка на согласование.</p>`
+      },
+      {
+        label: "Сделай",
+        body: `<p>Собери простой вариант системы в Make:</p>
+<ul>
+<li>Google Form: тематика поста, тон, ключевые слова, нужен ли визуал</li>
+<li>Make → Claude API: написать текст поста + промпт для Midjourney</li>
+<li>Результат → Telegram: получаешь текст + промпт для картинки</li>
+<li>(Опционально) Midjourney API для автогенерации изображения</li>
+</ul>`
+      },
+      {
+        label: "Результат",
+        body: `<p><strong>Полуавтоматический контент-завод:</strong> заполнил форму → получил готовый пост с изображением. 5 минут вместо 2 часов.</p>`
+      }
+    ],
+    resources: [
+      { icon: "🔌", title: "Midjourney API", desc: "Нет официального — используй unofficial wrappers или ImagineAPI.dev" },
+      { icon: "💡", title: "Альтернатива", desc: "DALL-E 3 API официальный — дешевле, проще, но качество ниже Midjourney" }
+    ],
+    blog: "Контент-завод: от брифа до готового поста без людей — показываю схему"
+  },
+  {
+    id: 25, phase: 4,
+    days: "76–80", title: "Продукт «Контент-завод» — упаковка",
+    tools: ["Make.com", "Midjourney", "HeyGen"],
+    steps: [
+      {
+        label: "Изучи",
+        body: `<p>Четыре дня назад ты собрал систему. Теперь — <strong>упакуй её в продукт</strong> который можно продавать.</p>
+<p>Целевые клиенты: рестораны (30–50 постов/мес), интернет-магазины (каталоги товаров), малый ритейл (промо и акции).</p>`
+      },
+      {
+        label: "Сделай",
+        body: `<p><strong>Дни 76–77:</strong> Отшлифуй систему. Сделай демонстрацию на реальном примере: возьми ресторан, создай 10 постов за 30 минут.</p>
+<p><strong>День 78:</strong> Напиши описание продукта: что входит, что получает клиент, цена (от 25 000 руб/мес).</p>
+<p><strong>Дни 79–80:</strong> Запиши короткое видео-демо (HeyGen или просто запись экрана). Опубликуй кейс в блог.</p>`
+      },
+      {
+        label: "Результат",
+        body: `<p><strong>Продукт «Контент-завод» готов к продаже:</strong> описание, кейс, демонстрация, цена. Второй флагман портфолио.</p>`
+      }
+    ],
+    resources: [
+      { icon: "💡", title: "Цены рынка", desc: "SMM + контент для ресторана: 40 000–80 000 руб/мес. Твоё предложение: 20 000–35 000" }
+    ],
+    blog: "День 80: контент-завод готов. Цена, что входит, кому подходит"
+  },
+
+  // PHASE 5
+  {
+    id: 26, phase: 5,
+    days: "81–83", title: "Упаковка услуг",
+    tools: ["Claude", "Notion"],
+    steps: [
+      {
+        label: "Изучи",
+        body: `<p>Услуги продаются плохо. <strong>Продукты</strong> — хорошо. Разница: продукт понятен (что входит, сколько стоит, что получу), услуга — туманна.</p>
+<p>Три твоих продукта: <br>1) «Система заявок» — лиды не теряются<br>2) «AI-воронка продаж» — лид до сделки на автопилоте<br>3) «Контент-завод» — AI-фото/видео для бизнеса</p>`
+      },
+      {
+        label: "Сделай",
+        body: `<p>Для каждого продукта напиши одностраничное описание (с помощью Claude):</p>
+<ul>
+<li>Название (короткое и понятное)</li>
+<li>Проблема которую решает (одно предложение)</li>
+<li>Что входит (маркированный список)</li>
+<li>Что получает клиент (результат)</li>
+<li>Стоимость и срок</li>
+<li>Один реальный кейс или гипотетический пример</li>
+</ul>`
+      },
+      {
+        label: "Результат",
+        body: `<p><strong>Три упакованных продукта</strong> с ценами и описаниями. Теперь на вопрос «чем ты занимаешься?» есть конкретный ответ.</p>`
+      }
+    ],
+    resources: [
+      { icon: "💡", title: "Совет", desc: "Попроси Claude: «Помоги упаковать эту услугу в продукт. Вот что я делаю: [описание]»" },
+      { icon: "📝", title: "Notion", desc: "notion.so — удобно хранить описания продуктов и кейсы" }
+    ],
+    blog: "Мои услуги после 80 дней обучения — честно о ценах и что умею"
+  },
+  {
+    id: 27, phase: 5,
+    days: "84–86", title: "Лендинг на вайбкодинге",
+    tools: ["Claude", "Netlify"],
+    steps: [
+      {
+        label: "Изучи",
+        body: `<p>Лендинг — одна страница с одним целевым действием. Структура работающего лендинга: <strong>проблема → решение → как это работает → кейсы → цены → CTA</strong>.</p>
+<p>Делаем через Claude: объясняешь что нужно, он генерирует HTML/CSS. Ты правишь текст, деплоишь на Netlify. Без программирования.</p>`
+      },
+      {
+        label: "Сделай",
+        body: `<p>Опиши Claude что нужно: «Сделай лендинг для специалиста по автоматизации бизнеса. Три продукта: [опиши]. Целевая аудитория: владельцы малого бизнеса. Стиль: строгий, современный, тёмная тема.»</p>
+<p>Получи HTML-файл. Открой в браузере. Отредактируй тексты и цены. Задеплой на Netlify (перетащи папку).</p>`
+      },
+      {
+        label: "Результат",
+        body: `<p><strong>Личный сайт с предложением услуг</strong> — готов за 3 часа. Адрес на Netlify можно дать любому потенциальному клиенту.</p>`
+      }
+    ],
+    resources: [
+      { icon: "🌐", title: "Netlify", desc: "netlify.com — бесплатный хостинг, деплой перетаскиванием папки" },
+      { icon: "💡", title: "Домен", desc: "reg.ru или namecheap.com — домен от 500 руб/год, подключается за 5 минут" }
+    ],
+    blog: "Сделал сайт за 3 часа с помощью AI — показываю как и что получилось"
+  },
+  {
+    id: 28, phase: 5,
+    days: "87–89", title: "Первые продажи",
+    tools: ["Telegram", "WhatsApp"],
+    steps: [
+      {
+        label: "Изучи",
+        body: `<p>Первые клиенты — из окружения. Не холодные звонки. <strong>Тёплый охват: 10–15 знакомых предпринимателей</strong> которым ты знаешь что предложить.</p>
+<p>Формула сообщения: «Привет, помню ты [конкретная проблема]. Я сейчас делаю [конкретное решение]. Можем поговорить 20 минут?»</p>`
+      },
+      {
+        label: "Сделай",
+        body: `<p><strong>День 87:</strong> Составь список 15 знакомых предпринимателей. Для каждого — одна конкретная боль которую ты можешь закрыть.</p>
+<p><strong>День 88:</strong> Напиши 5 сообщений. Не шаблонно — персонально. Отправь.</p>
+<p><strong>День 89:</strong> Обработай ответы. Договорись на звонки. Проведи хотя бы один разговор.</p>`
+      },
+      {
+        label: "Результат",
+        body: `<p>2–3 разговора с потенциальными клиентами. Возможно первая продажа. Точно — понимание что работает в питче, а что нет.</p>`
+      }
+    ],
+    resources: [
+      { icon: "💡", title: "Совет", desc: "Попроси Claude написать персонализированное сообщение для конкретного человека — дай контекст о нём" }
+    ],
+    blog: "День 87: первое платное предложение. Страшно — но делаю. Вот что ответили"
+  },
+  {
+    id: 29, phase: 5,
+    days: "90–92", title: "Кейс первого клиента",
+    tools: ["Notion", "Claude"],
+    steps: [
+      {
+        label: "Изучи",
+        body: `<p>Кейс — лучший инструмент продаж. Потенциальный клиент думает «это работало для кофейни — значит сработает и у меня».</p>
+<p>Структура кейса: <strong>Клиент и задача → Что было до → Что сделали → Результат в цифрах → Цитата клиента</strong>.</p>`
+      },
+      {
+        label: "Сделай",
+        body: `<p>Возьми проект из дня 36–40 (первый клиент) или текущий.</p>
+<ul>
+<li>Опиши проблему: «Кофейня теряла 30% заявок — менеджер не успевал отвечать»</li>
+<li>Опиши решение: схема Make, что автоматизировали</li>
+<li>Напиши результат: «Время ответа: с 2 часов до 3 минут. Конверсия заявки в встречу +40%»</li>
+<li>Оформи в HTML (попроси Claude) или в Notion-странице</li>
+</ul>`
+      },
+      {
+        label: "Результат",
+        body: `<p><strong>Первый кейс готов</strong> — на сайт, в блог, в личные переговоры. Это убеждает лучше любых слов о себе.</p>`
+      }
+    ],
+    resources: [
+      { icon: "💡", title: "Совет", desc: "Даже если цифры скромные — конкретные цифры лучше расплывчатых слов" }
+    ],
+    blog: "Первый кейс: что автоматизировал, сколько сэкономил клиент — честные цифры"
+  },
+  {
+    id: 30, phase: 5,
+    days: "93–95", title: "Система привлечения через блог",
+    tools: ["Make.com", "Telegram", "n8n"],
+    steps: [
+      {
+        label: "Изучи",
+        body: `<p>Контент-маркетинг работает медленно но устойчиво. <strong>Каждый пост в блоге — это актив который приносит лиды месяцами</strong>.</p>
+<p>Автоматизируй дистрибуцию: один пост → автоматически в Telegram + напоминание через неделю + ответ на комментарии.</p>`
+      },
+      {
+        label: "Сделай",
+        body: `<p>Настрой систему работы с блогом:</p>
+<ul>
+<li>Контент-план на 30 дней (попроси Claude на основе 100-дневного плана)</li>
+<li>Шаблон поста: крючок + история + инсайт + призыв</li>
+<li>Make сценарий: новый пост в Notion → автопостинг в Telegram канал</li>
+<li>Форма для заявок в конце каждого поста</li>
+</ul>`
+      },
+      {
+        label: "Результат",
+        body: `<p><strong>Полуавтоматическая система лидогенерации через контент.</strong> Блог начинает работать как воронка, а не просто дневник.</p>`
+      }
+    ],
+    resources: [
+      { icon: "💡", title: "Тест", desc: "Один сильный пост с конкретным кейсом даст больше лидов чем 10 общих постов" }
+    ],
+    blog: "Мой блог теперь приносит заявки — показываю схему которую настроил"
+  },
+  {
+    id: 31, phase: 5,
+    days: "96–99", title: "Итоги и план на следующие 100",
+    tools: ["Claude", "Notion"],
+    steps: [
+      {
+        label: "Изучи",
+        body: `<p>Ретроспектива — не формальность. Это <strong>самый важный инструмент роста</strong>. Без анализа прошлого — те же ошибки в будущем.</p>
+<p>Вопросы: Что принесло результат? Что потратил время впустую? Какой навык оказался самым ценным? Какой следующий шаг очевиден?</p>`
+      },
+      {
+        label: "Сделай",
+        body: `<p>Ответь на 10 вопросов письменно (попроси Claude помочь структурировать):</p>
+<ul>
+<li>Что умею сейчас чего не умел 100 дней назад?</li>
+<li>Сколько заработал / какие проекты сделал?</li>
+<li>Какой продукт лучше продаётся?</li>
+<li>Где провалился и чему это научило?</li>
+<li>Что изучить в следующие 100 дней?</li>
+</ul>
+<p>Напиши пост-итог. Это будет лучший пост в блоге.</p>`
+      },
+      {
+        label: "Результат",
+        body: `<p>Ясное понимание что работает и куда двигаться. Пост-итог с реальными цифрами — лучший социальный доказательство для новых клиентов.</p>`
+      }
+    ],
+    resources: [
+      { icon: "💡", title: "Совет", desc: "Честность в итогах притягивает больше клиентов чем успешный успех" }
+    ],
+    blog: "99 дней спустя: что умею, что заработал, что дальше — честные цифры"
+  },
+  {
+    id: 32, phase: 5,
+    days: "100", title: "День 100 — Финал",
+    tools: ["Всё"],
+    steps: [
+      {
+        label: "Изучи",
+        body: `<p>День 100 — не конец. Это <strong>точка трансформации</strong>. Ты начинал как человек который «хочет разобраться в автоматизации». Теперь ты специалист с портфолио, кейсами и первыми клиентами.</p>`
+      },
+      {
+        label: "Сделай",
+        body: `<p>Большой итоговый пост с цифрами:</p>
+<ul>
+<li>Сколько сценариев автоматизации сделал</li>
+<li>Сколько клиентов / кейсов / заработал</li>
+<li>Фото «до» и «после» — не внешний вид, а скиллы и проекты</li>
+<li>План на следующие 100 дней</li>
+<li>Слова благодарности аудитории которая следила</li>
+</ul>`
+      },
+      {
+        label: "Результат",
+        body: `<p><strong>Ты сделал это.</strong> 100 дней. 32 урока. Первые клиенты. Портфолио. Продукты.</p>
+<p>И главное — ты доказал себе что можешь довести до конца. Это меняет всё.</p>`
+      }
+    ],
+    resources: [],
+    blog: "День 100. Я сделал это. Вот всё что изменилось — цифры, кейсы, план"
+  }
+];
+
+// State
+let progress = JSON.parse(localStorage.getItem('curriculum_progress') || '{}');
+let currentLesson = null;
+
+function isCompleted(id) { return !!progress[id]; }
+
+function totalCompleted() { return Object.keys(progress).filter(k => progress[k]).length; }
+
+function updateHeaderProgress() {
+  const total = LESSONS.length;
+  const done = totalCompleted();
+  const pct = Math.round(done / total * 100);
+  document.getElementById('headerProgress').style.width = pct + '%';
+  document.getElementById('headerCount').textContent = done + ' / ' + total;
+}
+
+function resetProgress() {
+  if (confirm('Сбросить весь прогресс?')) {
+    progress = {};
+    localStorage.removeItem('curriculum_progress');
+    renderSidebar();
+    updateHeaderProgress();
+    showWelcome();
+  }
+}
+
+function toggleLesson(id) {
+  progress[id] = !progress[id];
+  if (!progress[id]) delete progress[id];
+  localStorage.setItem('curriculum_progress', JSON.stringify(progress));
+  renderSidebar();
+  updateHeaderProgress();
+  if (currentLesson) {
+    const btn = document.getElementById('completeBtn');
+    if (btn) {
+      btn.textContent = isCompleted(currentLesson) ? '✓ Выполнено' : 'Отметить выполненным';
+      btn.className = 'btn-complete' + (isCompleted(currentLesson) ? ' completed' : '');
+    }
+  }
+}
+
+function getLessonsForPhase(phaseId) {
+  return LESSONS.filter(l => l.phase === phaseId);
+}
+
+function renderSidebar() {
+  const sidebar = document.getElementById('sidebar');
+  sidebar.innerHTML = PHASES.map(phase => {
+    const lessons = getLessonsForPhase(phase.id);
+    const doneCount = lessons.filter(l => isCompleted(l.id)).length;
+    const isOpen = currentLesson && LESSONS.find(l => l.id === currentLesson)?.phase === phase.id;
+    return `
+      <div class="phase-group${isOpen ? ' open' : ''}" id="phase-group-${phase.id}">
+        <div class="phase-toggle" onclick="togglePhase(${phase.id})">
+          <div class="phase-toggle-left">
+            <div class="phase-toggle-name">Фаза ${phase.id}: ${phase.name}</div>
+            <div class="phase-toggle-range">${phase.days}</div>
+            <div class="phase-mini-progress">
+              ${lessons.map(l => `<div class="mini-dot${isCompleted(l.id) ? ' done' : ''}"></div>`).join('')}
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+            <div style="font-size:10px;color:var(--gray-2)">${doneCount}/${lessons.length}</div>
+            <div class="phase-toggle-arrow">▼</div>
+          </div>
+        </div>
+        <div class="lessons-nav">
+          ${lessons.map(l => `
+            <div class="nav-item${currentLesson === l.id ? ' active' : ''}" onclick="openLesson(${l.id})">
+              <div class="nav-check${isCompleted(l.id) ? ' done' : ''}">${isCompleted(l.id) ? '✓' : ''}</div>
+              <div class="nav-text">
+                <div class="nav-title">${l.title}</div>
+                <div class="nav-days">Дни ${l.days}</div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function togglePhase(id) {
+  const el = document.getElementById('phase-group-' + id);
+  el.classList.toggle('open');
+}
+
+function showWelcome() {
+  currentLesson = null;
+  renderSidebar();
+  const main = document.getElementById('main');
+  const totalDone = totalCompleted();
+  main.innerHTML = `
+    <div class="welcome-screen">
+      <div class="welcome-eyebrow">ПРОГРАММА ОБУЧЕНИЯ</div>
+      <h1 class="welcome-title">100 дней AI<br>и автоматизации</h1>
+      <p class="welcome-sub">От нуля до первых платных клиентов на автоматизацию бизнеса. Каждый блок — конкретные шаги: изучи, сделай, получи результат.</p>
+      <div class="welcome-stats">
+        <div class="stat-box">
+          <div class="stat-num">32</div>
+          <div class="stat-label">блока уроков</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num">5</div>
+          <div class="stat-label">фаз обучения</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num">${totalDone}</div>
+          <div class="stat-label">пройдено</div>
+        </div>
+      </div>
+      <div class="welcome-phases">
+        ${PHASES.map(p => {
+          const lessons = getLessonsForPhase(p.id);
+          const done = lessons.filter(l => isCompleted(l.id)).length;
+          return `
+          <div class="welcome-phase-card" onclick="openFirstLesson(${p.id})">
+            <div class="wpc-left">
+              <h3>Фаза ${p.id}: ${p.name}</h3>
+              <p>${p.tools} · ${done}/${lessons.length} пройдено</p>
+            </div>
+            <div class="wpc-right">
+              <span class="wpc-days">${p.days}</span>
+              <span class="wpc-arrow">→</span>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>
+  `;
+}
+
+function openFirstLesson(phaseId) {
+  const lessons = getLessonsForPhase(phaseId);
+  if (lessons.length) openLesson(lessons[0].id);
+}
+
+function openLesson(id) {
+  currentLesson = id;
+  const lesson = LESSONS.find(l => l.id === id);
+  if (!lesson) return;
+  renderSidebar();
+  const phase = PHASES.find(p => p.id === lesson.phase);
+  const idx = LESSONS.findIndex(l => l.id === id);
+  const prev = LESSONS[idx - 1];
+  const next = LESSONS[idx + 1];
+  const done = isCompleted(id);
+
+  const stepsHtml = lesson.steps.map((step, i) => `
+    <div class="step-card step-${i+1}">
+      <div class="step-header">
+        <div class="step-num">Шаг ${i+1}</div>
+        <div class="step-title">${step.label}</div>
+      </div>
+      <div class="step-body">${step.body}</div>
+    </div>
+  `).join('');
+
+  const resourcesHtml = lesson.resources.length ? `
+    <div class="resources-block">
+      <div class="section-label">Ресурсы</div>
+      ${lesson.resources.map(r => `
+        <div class="resource-row">
+          <div class="res-icon">${r.icon}</div>
+          <div class="res-info">
+            <strong>${r.title}</strong>
+            <span>${r.desc}</span>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+  ` : '';
+
+  const main = document.getElementById('main');
+  main.innerHTML = `
+    <div class="lesson-view">
+      <div class="lesson-eyebrow">
+        Фаза ${phase.id}<span class="lesson-eyebrow-sep">·</span>${phase.name}
+      </div>
+      <h1 class="lesson-title">${lesson.title}</h1>
+      <div class="lesson-meta">
+        <div class="meta-badge">Дни ${lesson.days}</div>
+        ${lesson.tools.map(t => `<div class="meta-badge meta-tool">${t}</div>`).join('')}
+      </div>
+      <div class="steps">${stepsHtml}</div>
+      ${resourcesHtml}
+      <div class="blog-block">
+        <div class="blog-eyebrow">📝 Пост в блог</div>
+        <div class="blog-post-title">"${lesson.blog}"</div>
+      </div>
+      <div class="complete-wrap">
+        <button ${prev ? '' : 'disabled'} class="btn-prev" onclick="openLesson(${prev?.id})">← Назад</button>
+        <button id="completeBtn" class="btn-complete${done ? ' completed' : ''}" onclick="toggleLesson(${id})">
+          ${done ? '✓ Выполнено' : 'Отметить выполненным'}
+        </button>
+        <button ${next ? '' : 'disabled'} class="btn-next" onclick="openLesson(${next?.id})">Вперёд →</button>
+      </div>
+    </div>
+  `;
+  main.scrollTop = 0;
+}
+
+// Init
+updateHeaderProgress();
+renderSidebar();
+showWelcome();
+</script>
+</body>
+</html>
