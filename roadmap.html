@@ -81,8 +81,8 @@ section, .container { position: relative; z-index: 1; }
   letter-spacing: 2px;
   text-transform: uppercase;
 }
-.hero-corner.tl { top: 32px; left: 48px; }
-.hero-corner.tr { top: 32px; right: 48px; text-align: right; }
+.hero-corner.tl { top: 72px; left: 48px; }
+.hero-corner.tr { top: 72px; right: 48px; text-align: right; }
 .hero-corner.bl { bottom: 32px; left: 48px; }
 .hero-corner.br { bottom: 32px; right: 48px; text-align: right; }
 
@@ -565,8 +565,63 @@ section, .container { position: relative; z-index: 1; }
   transform: translateY(0);
 }
 
+/* ─── NAV ─── */
+.site-nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  padding: 0 48px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(7,7,15,0.85);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.nav-brand {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.5);
+  text-decoration: none;
+}
+
+.nav-brand span { color: var(--accent); }
+
+.nav-links {
+  display: flex;
+  gap: 8px;
+}
+
+.nav-link {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.4);
+  text-decoration: none;
+  padding: 6px 14px;
+  border: 1px solid rgba(255,255,255,0.1);
+  transition: all 0.2s;
+}
+
+.nav-link:hover {
+  color: rgba(255,255,255,0.8);
+  border-color: rgba(255,255,255,0.2);
+}
+
+.nav-link.active {
+  color: var(--accent);
+  border-color: rgba(255,77,28,0.4);
+}
+
 /* ─── MOBILE ─── */
 @media (max-width: 768px) {
+  .site-nav { padding: 0 24px; }
+  .nav-brand { display: none; }
   .hero { padding: 80px 24px 120px; }
   .hero-corner.tr, .hero-corner.br { display: none; }
   .hero-stats { gap: 32px; }
@@ -595,6 +650,15 @@ section, .container { position: relative; z-index: 1; }
 </style>
 </head>
 <body>
+
+<nav class="site-nav">
+  <a href="index.html" class="nav-brand">Дмитрий <span>Лукин</span></a>
+  <div class="nav-links">
+    <a href="index.html" class="nav-link">Программа</a>
+    <a href="roadmap.html" class="nav-link active">Roadmap</a>
+    <a href="commands.html" class="nav-link">Команды</a>
+  </div>
+</nav>
 
 <!-- ─── HERO ─── -->
 <section class="hero">
