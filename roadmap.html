@@ -123,11 +123,9 @@ section, .container { position: relative; z-index: 1; }
   color: transparent;
   -webkit-text-stroke: 1px rgba(255,255,255,0.3);
 }
-#particleCanvas {
+.hero-title .line3 {
   display: block;
-  width: 100%;
-  height: clamp(80px, 14vw, 160px);
-  margin-bottom: 32px;
+  color: var(--accent);
 }
 
 .hero-sub {
@@ -685,8 +683,8 @@ section, .container { position: relative; z-index: 1; }
   <h1 class="hero-title">
     <span class="line1">От нуля</span>
     <span class="line2">до автоматизатора</span>
+    <span class="line3">12 месяцев</span>
   </h1>
-  <canvas id="particleCanvas"></canvas>
 
   <p class="hero-sub">
     Предприниматель осваивает AI и автоматизацию публично.<br>
@@ -978,8 +976,7 @@ document.querySelectorAll('.rule').forEach((rule, i) => {
   rule.style.transitionDelay = `${i * 0.1}s`;
 });
 
-// ─── PARTICLE TEXT EFFECT ───
-(function() {
+if (false) (function() {
   const WORDS = ['12 МЕСЯЦЕВ', 'ОТ НУЛЯ', '$15K/МЕС', 'АВТОМАТИЗАЦИЯ'];
   const ACCENT = { r: 255, g: 77, b: 28 };
   const PIXEL_STEP = 4;
