@@ -123,9 +123,11 @@ section, .container { position: relative; z-index: 1; }
   color: transparent;
   -webkit-text-stroke: 1px rgba(255,255,255,0.3);
 }
-.hero-title .line3 {
+#particleCanvas {
   display: block;
-  color: var(--accent);
+  width: 100%;
+  height: clamp(80px, 14vw, 160px);
+  margin-bottom: 32px;
 }
 
 .hero-sub {
@@ -683,8 +685,8 @@ section, .container { position: relative; z-index: 1; }
   <h1 class="hero-title">
     <span class="line1">От нуля</span>
     <span class="line2">до автоматизатора</span>
-    <span class="line3">12 месяцев</span>
   </h1>
+  <canvas id="particleCanvas"></canvas>
 
   <p class="hero-sub">
     Предприниматель осваивает AI и автоматизацию публично.<br>
@@ -975,6 +977,217 @@ document.querySelectorAll('.phase, .reveal, .rule').forEach(el => {
 document.querySelectorAll('.rule').forEach((rule, i) => {
   rule.style.transitionDelay = `${i * 0.1}s`;
 });
+
+// ─── PARTICLE TEXT EFFECT ───
+(function() {
+  const WORDS = ['12 МЕСЯЦЕВ', 'ОТ НУЛЯ', '$15K/МЕС', 'АВТОМАТИЗАЦИЯ'];
+  const ACCENT = { r: 255, g: 77, b: 28 };
+  const PIXEL_STEP = 4;
+
+  class Particle {
+    constructor() {
+      this.pos = { x: 0, y: 0 };
+      this.vel = { x: 0, y: 0 };
+      this.acc = { x: 0, y: 0 };
+      this.target = { x: 0, y: 0 };
+      this.closeEnoughTarget = 80;
+      this.maxSpeed = Math.random() * 6 + 4;
+      this.maxForce = this.maxSpeed * 0.05;
+      this.particleSize = Math.random() * 3 + 2;
+      this.isKilled = false;
+      this.startColor = { r: 0, g: 0, b: 0 };
+      this.targetColor = { ...ACCENT };
+      this.colorWeight = 0;
+      this.colorBlendRate = Math.random() * 0.03 + 0.005;
+    }
+
+    move() {
+      const dx = this.target.x - this.pos.x;
+      const dy = this.target.y - this.pos.y;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+      const proximityMult = distance < this.closeEnoughTarget ? distance / this.closeEnoughTarget : 1;
+
+      const mag = Math.sqrt(dx * dx + dy * dy) || 1;
+      const tx = (dx / mag) * this.maxSpeed * proximityMult;
+      const ty = (dy / mag) * this.maxSpeed * proximityMult;
+
+      const sx = tx - this.vel.x;
+      const sy = ty - this.vel.y;
+      const sm = Math.sqrt(sx * sx + sy * sy) || 1;
+
+      this.acc.x += (sx / sm) * this.maxForce;
+      this.acc.y += (sy / sm) * this.maxForce;
+
+      this.vel.x += this.acc.x;
+      this.vel.y += this.acc.y;
+      this.pos.x += this.vel.x;
+      this.pos.y += this.vel.y;
+      this.acc.x = 0;
+      this.acc.y = 0;
+    }
+
+    draw(ctx) {
+      if (this.colorWeight < 1.0) this.colorWeight = Math.min(this.colorWeight + this.colorBlendRate, 1.0);
+      const r = Math.round(this.startColor.r + (this.targetColor.r - this.startColor.r) * this.colorWeight);
+      const g = Math.round(this.startColor.g + (this.targetColor.g - this.startColor.g) * this.colorWeight);
+      const b = Math.round(this.startColor.b + (this.targetColor.b - this.startColor.b) * this.colorWeight);
+      ctx.fillStyle = `rgb(${r},${g},${b})`;
+      ctx.fillRect(this.pos.x, this.pos.y, this.particleSize, this.particleSize);
+    }
+
+    kill(w, h) {
+      if (!this.isKilled) {
+        const rx = Math.random() * w;
+        const ry = Math.random() * h;
+        const cx = w / 2, cy = h / 2;
+        const mag = Math.sqrt((rx - cx) ** 2 + (ry - cy) ** 2) || 1;
+        const dist = (w + h) / 2;
+        this.target.x = cx + ((rx - cx) / mag) * dist;
+        this.target.y = cy + ((ry - cy) / mag) * dist;
+
+        this.startColor = {
+          r: Math.round(this.startColor.r + (this.targetColor.r - this.startColor.r) * this.colorWeight),
+          g: Math.round(this.startColor.g + (this.targetColor.g - this.startColor.g) * this.colorWeight),
+          b: Math.round(this.startColor.b + (this.targetColor.b - this.startColor.b) * this.colorWeight),
+        };
+        this.targetColor = { r: 0, g: 0, b: 0 };
+        this.colorWeight = 0;
+        this.isKilled = true;
+      }
+    }
+  }
+
+  function initParticles() {
+    const canvas = document.getElementById('particleCanvas');
+    if (!canvas) return;
+
+    const dpr = window.devicePixelRatio || 1;
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    const ctx = canvas.getContext('2d');
+    ctx.scale(dpr, dpr);
+
+    const W = rect.width;
+    const H = rect.height;
+
+    let particles = [];
+    let frameCount = 0;
+    let wordIndex = 0;
+    let animId;
+
+    function randomEdgePos() {
+      const cx = W / 2, cy = H / 2;
+      const rx = Math.random() * W;
+      const ry = Math.random() * H;
+      const mag = Math.sqrt((rx - cx) ** 2 + (ry - cy) ** 2) || 1;
+      const dist = (W + H) / 2;
+      return { x: cx + ((rx - cx) / mag) * dist, y: cy + ((ry - cy) / mag) * dist };
+    }
+
+    function loadWord(word) {
+      const off = document.createElement('canvas');
+      off.width = W;
+      off.height = H;
+      const octx = off.getContext('2d');
+
+      const fontSize = Math.min(H * 0.75, W / word.length * 1.5);
+      octx.fillStyle = 'white';
+      octx.font = `900 ${fontSize}px 'Barlow Condensed', sans-serif`;
+      octx.textAlign = 'center';
+      octx.textBaseline = 'middle';
+      octx.fillText(word, W / 2, H / 2);
+
+      const imageData = octx.getImageData(0, 0, W, H);
+      const pixels = imageData.data;
+
+      const coords = [];
+      for (let i = 0; i < pixels.length; i += PIXEL_STEP * 4) {
+        if (pixels[i + 3] > 0) coords.push(i);
+      }
+
+      // shuffle
+      for (let i = coords.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [coords[i], coords[j]] = [coords[j], coords[i]];
+      }
+
+      let pi = 0;
+      for (const idx of coords) {
+        const x = (idx / 4) % W;
+        const y = Math.floor(idx / 4 / W);
+
+        let p;
+        if (pi < particles.length) {
+          p = particles[pi];
+          p.isKilled = false;
+        } else {
+          p = new Particle();
+          const rp = randomEdgePos();
+          p.pos.x = rp.x;
+          p.pos.y = rp.y;
+          particles.push(p);
+        }
+
+        p.startColor = {
+          r: Math.round(p.startColor.r + (p.targetColor.r - p.startColor.r) * p.colorWeight),
+          g: Math.round(p.startColor.g + (p.targetColor.g - p.startColor.g) * p.colorWeight),
+          b: Math.round(p.startColor.b + (p.targetColor.b - p.startColor.b) * p.colorWeight),
+        };
+        p.targetColor = { ...ACCENT };
+        p.colorWeight = 0;
+        p.target.x = x;
+        p.target.y = y;
+        pi++;
+      }
+
+      for (let i = pi; i < particles.length; i++) particles[i].kill(W, H);
+    }
+
+    function animate() {
+      ctx.fillStyle = 'rgba(7,7,15,0.15)';
+      ctx.fillRect(0, 0, W, H);
+
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.move();
+        p.draw(ctx);
+        if (p.isKilled && (p.pos.x < -50 || p.pos.x > W + 50 || p.pos.y < -50 || p.pos.y > H + 50)) {
+          particles.splice(i, 1);
+        }
+      }
+
+      frameCount++;
+      if (frameCount % 240 === 0) {
+        wordIndex = (wordIndex + 1) % WORDS.length;
+        loadWord(WORDS[wordIndex]);
+      }
+
+      animId = requestAnimationFrame(animate);
+    }
+
+    loadWord(WORDS[0]);
+    animate();
+
+    window.addEventListener('resize', () => {
+      cancelAnimationFrame(animId);
+      particles = [];
+      frameCount = 0;
+      const r2 = canvas.getBoundingClientRect();
+      canvas.width = r2.width * dpr;
+      canvas.height = r2.height * dpr;
+      ctx.scale(dpr, dpr);
+      loadWord(WORDS[wordIndex]);
+      animate();
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initParticles);
+  } else {
+    initParticles();
+  }
+})();
 </script>
 
 </body>
