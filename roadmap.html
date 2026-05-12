@@ -31,15 +31,10 @@ body {
   overflow-x: hidden;
 }
 
-/* GRID TEXTURE */
-body::before {
-  content: '';
+/* INTERACTIVE GRID CANVAS */
+#gridCanvas {
   position: fixed;
   inset: 0;
-  background-image:
-    linear-gradient(var(--line) 1px, transparent 1px),
-    linear-gradient(90deg, var(--line) 1px, transparent 1px);
-  background-size: 48px 48px;
   pointer-events: none;
   z-index: 0;
 }
@@ -654,6 +649,8 @@ section, .container { position: relative; z-index: 1; }
 </head>
 <body>
 
+<canvas id="gridCanvas"></canvas>
+
 <nav class="site-nav">
   <a href="index.html" class="nav-brand">Дмитрий <span>Лукин</span></a>
   <div class="nav-links">
@@ -975,6 +972,85 @@ document.querySelectorAll('.phase, .reveal, .rule').forEach(el => {
 document.querySelectorAll('.rule').forEach((rule, i) => {
   rule.style.transitionDelay = `${i * 0.1}s`;
 });
+
+// ─── INTERACTIVE GRID ───
+(function() {
+  const canvas = document.getElementById('gridCanvas');
+  const ctx = canvas.getContext('2d');
+
+  const DOT_DISTANCE = 36;
+  const DOT_RADIUS = 1.5;
+  const MIN_PROXIMITY = 180;
+  const MIN_PROX_SQ = MIN_PROXIMITY * MIN_PROXIMITY;
+
+  let mouse = { x: -9999, y: -9999 };
+  let hue = 0;
+  let dots = [];
+  let animId;
+
+  function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    buildDots();
+  }
+
+  function buildDots() {
+    dots = [];
+    for (let x = 0; x < canvas.width; x += DOT_DISTANCE) {
+      for (let y = 0; y < canvas.height; y += DOT_DISTANCE) {
+        dots.push({ x, y });
+      }
+    }
+  }
+
+  function animate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    for (const dot of dots) {
+      const dX = dot.x - mouse.x;
+      const dY = dot.y - mouse.y;
+      const distSq = dX * dX + dY * dY;
+
+      if (distSq <= MIN_PROX_SQ) {
+        const brightness = 55 - (distSq / MIN_PROX_SQ) * 45;
+        const color = `hsl(${hue}, 85%, ${brightness}%)`;
+        ctx.globalAlpha = 1 - distSq / MIN_PROX_SQ;
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 0.5;
+        ctx.beginPath();
+        ctx.moveTo(dot.x, dot.y);
+        ctx.lineTo(mouse.x, mouse.y);
+        ctx.stroke();
+
+        ctx.globalAlpha = 1;
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.arc(dot.x, dot.y, DOT_RADIUS * (1 + (1 - distSq / MIN_PROX_SQ)), 0, Math.PI * 2);
+        ctx.fill();
+      } else {
+        ctx.globalAlpha = 0.18;
+        ctx.fillStyle = 'rgba(255,255,255,0.6)';
+        ctx.beginPath();
+        ctx.arc(dot.x, dot.y, DOT_RADIUS * 0.7, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    ctx.globalAlpha = 1;
+    animId = requestAnimationFrame(animate);
+  }
+
+  window.addEventListener('mousemove', (e) => {
+    mouse.x = e.clientX;
+    mouse.y = e.clientY;
+    hue = ((e.clientX / window.innerWidth + e.clientY / window.innerHeight) * 200 + 10) % 360;
+  });
+
+  window.addEventListener('resize', resize);
+
+  resize();
+  animate();
+})();
 
 if (false) (function() {
   const WORDS = ['12 МЕСЯЦЕВ', 'ОТ НУЛЯ', '$15K/МЕС', 'АВТОМАТИЗАЦИЯ'];
