@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Дорожная карта — Дмитрий Лукин</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;600;700;800;900&family=Space+Mono:wght@400;700&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #07070f;
+  --bg2: #0d0d1e;
+  --bg3: #111128;
+  --accent: #ff4d1c;
+  --green: #00e5a0;
+  --amber: #ffb830;
+  --text: #d8d8ee;
+  --muted: #3a3a5c;
+  --line: rgba(255,255,255,0.06);
+  --font-head: 'Barlow Condensed', sans-serif;
+  --font-mono: 'Space Mono', monospace;
+  --font-body: 'Barlow', sans-serif;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  overflow-x: hidden;
+}
+
+/* GRID TEXTURE */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(var(--line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line) 1px, transparent 1px);
+  background-size: 48px 48px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* SCAN LINE */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,0.15) 2px,
+    rgba(0,0,0,0.15) 4px
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+
+section, .container { position: relative; z-index: 1; }
+
+/* ─── HERO ─── */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 80px 48px;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-corner {
+  position: absolute;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+.hero-corner.tl { top: 32px; left: 48px; }
+.hero-corner.tr { top: 32px; right: 48px; text-align: right; }
+.hero-corner.bl { bottom: 32px; left: 48px; }
+.hero-corner.br { bottom: 32px; right: 48px; text-align: right; }
+
+.hero-corner span { color: var(--accent); }
+
+.classified {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 6px;
+  color: var(--accent);
+  border: 1px solid var(--accent);
+  padding: 6px 16px;
+  margin-bottom: 40px;
+  text-transform: uppercase;
+  animation: blink 2s step-end infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.hero-title {
+  font-family: var(--font-head);
+  font-size: clamp(72px, 12vw, 160px);
+  font-weight: 900;
+  line-height: 0.9;
+  text-transform: uppercase;
+  letter-spacing: -2px;
+  margin-bottom: 32px;
+}
+
+.hero-title .line1 { display: block; color: #fff; }
+.hero-title .line2 {
+  display: block;
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(255,255,255,0.3);
+}
+.hero-title .line3 {
+  display: block;
+  color: var(--accent);
+}
+
+.hero-sub {
+  max-width: 560px;
+  font-family: var(--font-body);
+  font-size: 18px;
+  font-weight: 300;
+  line-height: 1.7;
+  color: rgba(216,216,238,0.7);
+  margin-bottom: 56px;
+  border-left: 2px solid var(--accent);
+  padding-left: 24px;
+}
+
+.hero-stats {
+  display: flex;
+  gap: 48px;
+  flex-wrap: wrap;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+}
+.stat-num {
+  font-family: var(--font-head);
+  font-size: 48px;
+  font-weight: 800;
+  color: var(--amber);
+  line-height: 1;
+}
+.stat-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-top: 4px;
+}
+
+.scroll-hint {
+  position: absolute;
+  bottom: 48px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 3px;
+  color: var(--muted);
+  text-transform: uppercase;
+  animation: scrollpulse 2s ease-in-out infinite;
+}
+
+.scroll-hint::after {
+  content: '';
+  width: 1px;
+  height: 48px;
+  background: linear-gradient(var(--muted), transparent);
+}
+
+@keyframes scrollpulse {
+  0%, 100% { opacity: 0.4; transform: translateX(-50%) translateY(0); }
+  50% { opacity: 1; transform: translateX(-50%) translateY(6px); }
+}
+
+/* ─── SECTION WRAPPER ─── */
+.section {
+  padding: 120px 48px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.section-tag {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.section-tag::before {
+  content: '';
+  width: 32px;
+  height: 1px;
+  background: var(--accent);
+}
+
+.section-title {
+  font-family: var(--font-head);
+  font-size: clamp(48px, 7vw, 96px);
+  font-weight: 800;
+  text-transform: uppercase;
+  line-height: 0.95;
+  letter-spacing: -1px;
+  color: #fff;
+  margin-bottom: 64px;
+}
+
+/* ─── TIMELINE ─── */
+.timeline {
+  position: relative;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 32px;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: linear-gradient(var(--accent), var(--amber), var(--green));
+  opacity: 0.4;
+}
+
+.phase {
+  position: relative;
+  padding-left: 96px;
+  margin-bottom: 96px;
+  opacity: 0;
+  transform: translateX(-24px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+
+.phase.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.phase-marker {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 64px;
+  height: 64px;
+  border: 1px solid;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-head);
+  font-size: 28px;
+  font-weight: 900;
+}
+
+.phase:nth-child(1) .phase-marker { border-color: var(--accent); color: var(--accent); background: rgba(255,77,28,0.08); }
+.phase:nth-child(2) .phase-marker { border-color: var(--amber); color: var(--amber); background: rgba(255,184,48,0.08); }
+.phase:nth-child(3) .phase-marker { border-color: var(--green); color: var(--green); background: rgba(0,229,160,0.08); }
+
+.phase-meta {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  margin-bottom: 8px;
+}
+
+.phase-period {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 3px;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
+.phase-name {
+  font-family: var(--font-head);
+  font-size: clamp(36px, 5vw, 64px);
+  font-weight: 800;
+  text-transform: uppercase;
+  line-height: 1;
+  color: #fff;
+  margin-bottom: 32px;
+  letter-spacing: -0.5px;
+}
+
+.phase:nth-child(1) .phase-name em { color: var(--accent); font-style: normal; }
+.phase:nth-child(2) .phase-name em { color: var(--amber); font-style: normal; }
+.phase:nth-child(3) .phase-name em { color: var(--green); font-style: normal; }
+
+.phase-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+.phase-card {
+  background: var(--bg2);
+  border: 1px solid var(--line);
+  padding: 28px;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.3s, transform 0.3s;
+}
+
+.phase-card:hover {
+  border-color: rgba(255,255,255,0.12);
+  transform: translateY(-2px);
+}
+
+.phase-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 3px;
+  height: 100%;
+}
+
+.phase:nth-child(1) .phase-card::before { background: var(--accent); }
+.phase:nth-child(2) .phase-card::before { background: var(--amber); }
+.phase:nth-child(3) .phase-card::before { background: var(--green); }
+
+.card-platform {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+.phase:nth-child(1) .card-platform { color: var(--accent); }
+.phase:nth-child(2) .card-platform { color: var(--amber); }
+.phase:nth-child(3) .card-platform { color: var(--green); }
+
+.card-desc {
+  font-size: 15px;
+  color: rgba(216,216,238,0.8);
+  line-height: 1.6;
+  font-weight: 300;
+}
+
+.phase-kpi {
+  display: flex;
+  gap: 32px;
+  flex-wrap: wrap;
+  padding: 24px;
+  border: 1px solid;
+  background: rgba(0,0,0,0.3);
+}
+
+.phase:nth-child(1) .phase-kpi { border-color: rgba(255,77,28,0.3); }
+.phase:nth-child(2) .phase-kpi { border-color: rgba(255,184,48,0.3); }
+.phase:nth-child(3) .phase-kpi { border-color: rgba(0,229,160,0.3); }
+
+.kpi-item { display: flex; flex-direction: column; }
+
+.kpi-val {
+  font-family: var(--font-head);
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.phase:nth-child(1) .kpi-val { color: var(--accent); }
+.phase:nth-child(2) .kpi-val { color: var(--amber); }
+.phase:nth-child(3) .kpi-val { color: var(--green); }
+
+.kpi-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-top: 4px;
+}
+
+/* ─── DIVIDER ─── */
+.divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--line) 20%, var(--line) 80%, transparent);
+  margin: 0 48px;
+}
+
+/* ─── PLATFORMS ─── */
+.platforms {
+  background: var(--bg2);
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.platforms-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 80px 48px;
+}
+
+.platforms-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 48px;
+}
+
+.platforms-table th {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-align: left;
+  padding: 12px 24px;
+  border-bottom: 1px solid var(--line);
+}
+
+.platforms-table td {
+  padding: 24px;
+  border-bottom: 1px solid var(--line);
+  vertical-align: middle;
+}
+
+.platforms-table tr:last-child td { border-bottom: none; }
+
+.platforms-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+.platform-name {
+  font-family: var(--font-head);
+  font-size: 28px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.tg .platform-name { color: #29b6f6; }
+.ig .platform-name { color: #f06292; }
+.yt .platform-name { color: #ef5350; }
+
+.platform-role {
+  font-size: 15px;
+  color: rgba(216,216,238,0.7);
+  font-weight: 300;
+}
+
+.platform-freq {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--amber);
+  letter-spacing: 1px;
+}
+
+/* ─── RULES ─── */
+.rules-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 2px;
+  margin-top: 48px;
+  background: var(--line);
+}
+
+.rule {
+  background: var(--bg);
+  padding: 40px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.rule.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.rule:nth-child(1) { transition-delay: 0s; }
+.rule:nth-child(2) { transition-delay: 0.1s; }
+.rule:nth-child(3) { transition-delay: 0.2s; }
+.rule:nth-child(4) { transition-delay: 0.3s; }
+.rule:nth-child(5) { transition-delay: 0.4s; }
+
+.rule:hover { background: var(--bg2); }
+
+.rule-num {
+  font-family: var(--font-head);
+  font-size: 72px;
+  font-weight: 900;
+  color: transparent;
+  -webkit-text-stroke: 1px var(--muted);
+  line-height: 1;
+}
+
+.rule-text {
+  font-family: var(--font-head);
+  font-size: 22px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #fff;
+  line-height: 1.2;
+}
+
+/* ─── FOOTER ─── */
+.footer {
+  padding: 80px 48px;
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 32px;
+}
+
+.footer-brand {
+  font-family: var(--font-head);
+  font-size: 48px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -1px;
+  line-height: 1;
+}
+
+.footer-brand span { color: var(--accent); }
+
+.footer-meta {
+  text-align: right;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 2px;
+  line-height: 2;
+}
+
+/* ─── REVEAL ─── */
+.reveal {
+  opacity: 0;
+  transform: translateY(32px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ─── MOBILE ─── */
+@media (max-width: 768px) {
+  .hero { padding: 80px 24px 120px; }
+  .hero-corner.tr, .hero-corner.br { display: none; }
+  .hero-stats { gap: 32px; }
+
+  .section { padding: 80px 24px; }
+  .divider { margin: 0 24px; }
+
+  .phase { padding-left: 72px; }
+  .phase-grid { grid-template-columns: 1fr; }
+  .phase-kpi { gap: 24px; }
+
+  .platforms-inner { padding: 60px 24px; }
+  .platforms-table th:nth-child(3),
+  .platforms-table td:nth-child(3) { display: none; }
+
+  .rules-grid { grid-template-columns: 1fr 1fr; }
+  .rule { padding: 28px 20px; }
+
+  .footer { padding: 60px 24px; }
+  .footer-meta { text-align: left; }
+}
+
+@media (max-width: 480px) {
+  .rules-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- ─── HERO ─── -->
+<section class="hero">
+  <div class="hero-corner tl">
+    MISSION BRIEF // <span>АКТИВНО</span>
+  </div>
+  <div class="hero-corner tr">
+    СТАРТ: МАЙ 2026<br>ФИНИШ: МАЙ 2027
+  </div>
+  <div class="hero-corner bl">
+    ДМИТРИЙ ЛУКИН // АВТОМАТИЗАЦИЯ БИЗНЕСА
+  </div>
+  <div class="hero-corner br">
+    ОТ НУЛЯ ДО <span>$15K/МЕС</span>
+  </div>
+
+  <div class="classified">◉ Миссия активирована</div>
+
+  <h1 class="hero-title">
+    <span class="line1">От нуля</span>
+    <span class="line2">до автоматизатора</span>
+    <span class="line3">12 месяцев</span>
+  </h1>
+
+  <p class="hero-sub">
+    Предприниматель осваивает AI и автоматизацию публично.<br>
+    Без технического бэкграунда. Честно.
+  </p>
+
+  <div class="hero-stats">
+    <div class="stat">
+      <span class="stat-num">3</span>
+      <span class="stat-label">Фазы</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num">100</span>
+      <span class="stat-label">Дней челендж</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num">$15K</span>
+      <span class="stat-label">Цель/месяц</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num">∞</span>
+      <span class="stat-label">Рынок</span>
+    </div>
+  </div>
+
+  <div class="scroll-hint">Прокрути</div>
+</section>
+
+<!-- ─── TIMELINE ─── -->
+<div class="section">
+  <div class="section-tag reveal">Дорожная карта</div>
+  <h2 class="section-title reveal">Три<br>фазы</h2>
+
+  <div class="timeline">
+
+    <!-- PHASE 1 -->
+    <div class="phase">
+      <div class="phase-marker">01</div>
+      <div class="phase-meta">
+        <span class="phase-period">Месяцы 1–3</span>
+      </div>
+      <div class="phase-name">100 дней<br><em>Челендж</em></div>
+      <div class="phase-grid">
+        <div class="phase-card">
+          <div class="card-platform">Telegram</div>
+          <div class="card-desc">Ежедневный дневник: что делал, что сломалось, что открыл</div>
+        </div>
+        <div class="phase-card">
+          <div class="card-platform">Instagram Reels</div>
+          <div class="card-desc">Экран + голос за кадром. Показываю как автоматизирую в реальном времени</div>
+        </div>
+        <div class="phase-card">
+          <div class="card-platform">YouTube</div>
+          <div class="card-desc">Еженедельный разбор: инструменты, сценарии, ошибки недели</div>
+        </div>
+        <div class="phase-card">
+          <div class="card-platform">Действие</div>
+          <div class="card-desc">Коллаборации с авторами в нише. Отвечаю на каждый комментарий</div>
+        </div>
+      </div>
+      <div class="phase-kpi">
+        <div class="kpi-item">
+          <span class="kpi-val">1 000</span>
+          <span class="kpi-label">Telegram</span>
+        </div>
+        <div class="kpi-item">
+          <span class="kpi-val">2 000</span>
+          <span class="kpi-label">Instagram</span>
+        </div>
+        <div class="kpi-item">
+          <span class="kpi-val">500</span>
+          <span class="kpi-label">YouTube</span>
+        </div>
+        <div class="kpi-item">
+          <span class="kpi-val">$0</span>
+          <span class="kpi-label">Строим базу</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- PHASE 2 -->
+    <div class="phase">
+      <div class="phase-marker">02</div>
+      <div class="phase-meta">
+        <span class="phase-period">Месяцы 4–6</span>
+      </div>
+      <div class="phase-name">Первые<br><em>Деньги</em></div>
+      <div class="phase-grid">
+        <div class="phase-card">
+          <div class="card-platform">Кейсы</div>
+          <div class="card-desc">Реальный клиент, реальный результат. Документирую каждый шаг</div>
+        </div>
+        <div class="phase-card">
+          <div class="card-platform">Консультация</div>
+          <div class="card-desc">Разбор автоматизации конкретного бизнеса — $150–300</div>
+        </div>
+        <div class="phase-card">
+          <div class="card-platform">Автоворонка</div>
+          <div class="card-desc">Форма → CRM → уведомления → письма. Под ключ — $500–1500</div>
+        </div>
+        <div class="phase-card">
+          <div class="card-platform">Telegram-бот + AI</div>
+          <div class="card-desc">Квалификация лидов, замена первого звонка — $800–2000</div>
+        </div>
+      </div>
+      <div class="phase-kpi">
+        <div class="kpi-item">
+          <span class="kpi-val">3 000</span>
+          <span class="kpi-label">Telegram</span>
+        </div>
+        <div class="kpi-item">
+          <span class="kpi-val">5 000</span>
+          <span class="kpi-label">Instagram</span>
+        </div>
+        <div class="kpi-item">
+          <span class="kpi-val">2 000</span>
+          <span class="kpi-label">YouTube</span>
+        </div>
+        <div class="kpi-item">
+          <span class="kpi-val">$3K</span>
+          <span class="kpi-label">Первые продажи</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- PHASE 3 -->
+    <div class="phase">
+      <div class="phase-marker">03</div>
+      <div class="phase-meta">
+        <span class="phase-period">Месяцы 7–12</span>
+      </div>
+      <div class="phase-name">Международный<br><em>Выход</em></div>
+      <div class="phase-grid">
+        <div class="phase-card">
+          <div class="card-platform">English Content</div>
+          <div class="card-desc">Лучшие Reels и посты адаптированы на английский. Субтитры автоматически</div>
+        </div>
+        <div class="phase-card">
+          <div class="card-platform">LinkedIn B2B</div>
+          <div class="card-desc">Кейсы и статьи для международных клиентов. Цены в долларах</div>
+        </div>
+        <div class="phase-card">
+          <div class="card-platform">Масштаб</div>
+          <div class="card-desc">AI-переводы через Claude. Система продаж на автопилоте</div>
+        </div>
+        <div class="phase-card">
+          <div class="card-platform">Глобальный рынок</div>
+          <div class="card-desc">РФ → СНГ → Европа → Мир. Языковой барьер убирает Claude</div>
+        </div>
+      </div>
+      <div class="phase-kpi">
+        <div class="kpi-item">
+          <span class="kpi-val">15 000</span>
+          <span class="kpi-label">Telegram</span>
+        </div>
+        <div class="kpi-item">
+          <span class="kpi-val">20 000</span>
+          <span class="kpi-label">Instagram</span>
+        </div>
+        <div class="kpi-item">
+          <span class="kpi-val">10 000</span>
+          <span class="kpi-label">YouTube</span>
+        </div>
+        <div class="kpi-item">
+          <span class="kpi-val">$15K</span>
+          <span class="kpi-label">В месяц</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ─── PLATFORMS ─── -->
+<div class="platforms">
+  <div class="platforms-inner">
+    <div class="section-tag reveal">Платформы</div>
+    <h2 class="section-title reveal">Три<br>канала</h2>
+
+    <table class="platforms-table reveal">
+      <thead>
+        <tr>
+          <th>Платформа</th>
+          <th>Роль</th>
+          <th>Частота</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="tg">
+          <td><div class="platform-name">Telegram</div></td>
+          <td><div class="platform-role">Основной штаб. Дневник в реальном времени. Здесь живут самые честные посты</div></td>
+          <td><div class="platform-freq">Ежедневно</div></td>
+        </tr>
+        <tr class="ig">
+          <td><div class="platform-name">Instagram</div></td>
+          <td><div class="platform-role">Охват и визуальный бренд. Reels — главный инструмент роста новой аудитории</div></td>
+          <td><div class="platform-freq">4–5 раз в неделю</div></td>
+        </tr>
+        <tr class="yt">
+          <td><div class="platform-name">YouTube</div></td>
+          <td><div class="platform-role">Глубина и SEO. Долгосрочный актив. Видео живут и работают годами</div></td>
+          <td><div class="platform-freq">1 раз в неделю</div></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ─── RULES ─── -->
+<div class="section">
+  <div class="section-tag reveal">Протокол</div>
+  <h2 class="section-title reveal">5 правил<br>контента</h2>
+
+  <div class="rules-grid">
+    <div class="rule">
+      <div class="rule-num">01</div>
+      <div class="rule-text">Показывай экран</div>
+    </div>
+    <div class="rule">
+      <div class="rule-num">02</div>
+      <div class="rule-text">Публикуй ошибки</div>
+    </div>
+    <div class="rule">
+      <div class="rule-num">03</div>
+      <div class="rule-text">Один пост — одна идея</div>
+    </div>
+    <div class="rule">
+      <div class="rule-num">04</div>
+      <div class="rule-text">Консистентность важнее вирусности</div>
+    </div>
+    <div class="rule">
+      <div class="rule-num">05</div>
+      <div class="rule-text">CTA в каждом посте</div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── FOOTER ─── -->
+<footer>
+  <div class="footer">
+    <div class="footer-brand">
+      Дмитрий<br><span>Лукин</span>
+    </div>
+    <div class="footer-meta">
+      ВАЙБКОДИНГ И АВТОМАТИЗАЦИЯ<br>
+      100 ДНЕЙ // МАЙ 2026<br>
+      lukinmiami-max.github.io/100-days-ai
+    </div>
+  </div>
+</footer>
+
+<script>
+// Intersection Observer для анимаций
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(el => {
+    if (el.isIntersecting) {
+      el.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.15 });
+
+document.querySelectorAll('.phase, .reveal, .rule').forEach(el => {
+  observer.observe(el);
+});
+
+// Задержка для правил
+document.querySelectorAll('.rule').forEach((rule, i) => {
+  rule.style.transitionDelay = `${i * 0.1}s`;
+});
+</script>
+
+</body>
+</html>
