@@ -514,12 +514,14 @@ section, .container { position: relative; z-index: 1; }
 
 .rule-text {
   font-family: var(--font-head);
-  font-size: 22px;
+  font-size: clamp(16px, 1.5vw, 22px);
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0;
   color: #fff;
   line-height: 1.2;
+  word-break: break-word;
+  hyphens: auto;
 }
 
 /* ─── FOOTER ─── */
