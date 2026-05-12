@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Команды — Дмитрий Лукин</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --black: #0a0a0a;
+  --white: #ffffff;
+  --accent: #d8fb03;
+  --gray-1: #f2f2f2;
+  --gray-2: #b0b0b0;
+  --gray-3: #444444;
+  --line: rgba(255,255,255,0.08);
+  --tag-content: #29b6f6;
+  --tag-design: #f06292;
+  --tag-context: #b0b0b0;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--black);
+  color: var(--white);
+  font-family: 'Space Grotesk', 'Helvetica Neue', Arial, sans-serif;
+  min-height: 100vh;
+}
+
+/* NAV */
+nav {
+  border-bottom: 1px solid var(--line);
+  padding: 0 48px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.nav-brand {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--white);
+  text-decoration: none;
+}
+
+.nav-links {
+  display: flex;
+  gap: 32px;
+}
+
+.nav-links a {
+  font-size: 12px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--gray-2);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.nav-links a:hover { color: var(--white); }
+.nav-links a.active { color: var(--accent); }
+
+/* HERO */
+.hero {
+  padding: 80px 48px 64px;
+  max-width: 1100px;
+  margin: 0 auto;
+  border-bottom: 1px solid var(--line);
+}
+
+.hero-label {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--gray-2);
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.hero-label::before {
+  content: '';
+  width: 24px;
+  height: 1px;
+  background: var(--accent);
+}
+
+.hero-title {
+  font-size: clamp(48px, 6vw, 80px);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -2px;
+  margin-bottom: 24px;
+}
+
+.hero-title span { color: var(--accent); }
+
+.hero-sub {
+  font-size: 16px;
+  color: var(--gray-2);
+  font-weight: 300;
+  max-width: 480px;
+  line-height: 1.6;
+}
+
+.hero-count {
+  margin-top: 40px;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.count-num {
+  font-size: 48px;
+  font-weight: 700;
+  color: var(--accent);
+  line-height: 1;
+}
+
+.count-label {
+  font-size: 13px;
+  color: var(--gray-2);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+/* FILTER TABS */
+.filters {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 32px 48px 0;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.filter-btn {
+  padding: 8px 20px;
+  background: transparent;
+  border: 1px solid var(--line);
+  color: var(--gray-2);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s;
+  border-radius: 0;
+}
+
+.filter-btn:hover {
+  border-color: rgba(255,255,255,0.2);
+  color: var(--white);
+}
+
+.filter-btn.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--black);
+}
+
+/* TABLE SECTION */
+.section {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 32px 48px 80px;
+}
+
+/* DESKTOP TABLE */
+.cmd-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.cmd-table thead tr {
+  border-bottom: 1px solid rgba(255,255,255,0.15);
+}
+
+.cmd-table th {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--gray-2);
+  text-align: left;
+  padding: 0 24px 16px 0;
+}
+
+.cmd-table th:last-child { padding-right: 0; }
+
+.cmd-table tbody tr {
+  border-bottom: 1px solid var(--line);
+  transition: background 0.15s;
+}
+
+.cmd-table tbody tr:hover {
+  background: rgba(255,255,255,0.03);
+}
+
+.cmd-table td {
+  padding: 20px 24px 20px 0;
+  vertical-align: middle;
+}
+
+.cmd-table td:last-child { padding-right: 0; }
+
+/* Command badge */
+.cmd-badge {
+  display: inline-block;
+  font-family: 'Space Grotesk', monospace;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--accent);
+  background: rgba(216, 251, 3, 0.07);
+  border: 1px solid rgba(216, 251, 3, 0.2);
+  padding: 6px 14px;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+/* Category tag */
+.cat-tag {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border: 1px solid;
+}
+
+.cat-tag.content { color: var(--tag-content); border-color: rgba(41,182,246,0.3); background: rgba(41,182,246,0.06); }
+.cat-tag.design { color: var(--tag-design); border-color: rgba(240,98,146,0.3); background: rgba(240,98,146,0.06); }
+.cat-tag.context { color: var(--tag-context); border-color: rgba(176,176,176,0.3); background: rgba(176,176,176,0.06); }
+
+.cmd-desc {
+  font-size: 15px;
+  color: var(--white);
+  font-weight: 400;
+  line-height: 1.4;
+}
+
+.cmd-when {
+  font-size: 13px;
+  color: var(--gray-2);
+  font-weight: 300;
+  line-height: 1.5;
+  max-width: 280px;
+}
+
+/* MOBILE CARDS */
+.cmd-cards { display: none; }
+
+.cmd-card {
+  border: 1px solid var(--line);
+  padding: 24px;
+  margin-bottom: 12px;
+  transition: border-color 0.2s;
+}
+
+.cmd-card:hover { border-color: rgba(255,255,255,0.15); }
+
+.card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.card-desc { font-size: 15px; color: var(--white); margin-bottom: 10px; line-height: 1.5; }
+.card-when { font-size: 13px; color: var(--gray-2); line-height: 1.5; }
+
+/* FOOTER */
+footer {
+  border-top: 1px solid var(--line);
+  padding: 32px 48px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.footer-brand {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.footer-brand span { color: var(--accent); }
+
+.footer-meta {
+  font-size: 11px;
+  color: var(--gray-2);
+  letter-spacing: 1px;
+  text-align: right;
+  line-height: 1.8;
+  text-transform: uppercase;
+}
+
+/* HIDDEN rows */
+.cmd-row[data-cat].hidden { display: none; }
+.cmd-card[data-cat].hidden { display: none; }
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  nav { padding: 0 24px; }
+  .nav-links { gap: 16px; }
+  .hero { padding: 48px 24px 40px; }
+  .filters { padding: 24px 24px 0; }
+  .section { padding: 24px 24px 64px; }
+  footer { padding: 24px; flex-direction: column; gap: 12px; text-align: center; }
+  .footer-meta { text-align: center; }
+
+  .cmd-table { display: none; }
+  .cmd-cards { display: block; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-brand">Дмитрий Лукин</a>
+  <div class="nav-links">
+    <a href="index.html">Программа</a>
+    <a href="roadmap.html">Roadmap</a>
+    <a href="commands.html" class="active">Команды</a>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="hero-label">Справочник</div>
+  <h1 class="hero-title">Slash<br><span>Команды</span></h1>
+  <p class="hero-sub">Быстрый доступ ко всем скиллам. Вызывай командой в Claude Code.</p>
+  <div class="hero-count">
+    <span class="count-num" id="cmdCount">9</span>
+    <span class="count-label">команд</span>
+  </div>
+</div>
+
+<div class="filters">
+  <button class="filter-btn active" data-filter="all">Все</button>
+  <button class="filter-btn" data-filter="content">Контент</button>
+  <button class="filter-btn" data-filter="design">Дизайн</button>
+  <button class="filter-btn" data-filter="context">Контекст</button>
+</div>
+
+<div class="section">
+
+  <!-- DESKTOP TABLE -->
+  <table class="cmd-table">
+    <thead>
+      <tr>
+        <th>Команда</th>
+        <th>Категория</th>
+        <th>Описание</th>
+        <th>Когда использовать</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="cmd-row" data-cat="content">
+        <td><span class="cmd-badge">/tg-post</span></td>
+        <td><span class="cat-tag content">Контент</span></td>
+        <td><span class="cmd-desc">Посты для Телеграм</span></td>
+        <td><span class="cmd-when">Ежедневный дневник, анонсы, кейсы. Два режима: короткий и длинный.</span></td>
+      </tr>
+      <tr class="cmd-row" data-cat="content">
+        <td><span class="cmd-badge">/threads-post</span></td>
+        <td><span class="cat-tag content">Контент</span></td>
+        <td><span class="cmd-desc">Посты для Threads</span></td>
+        <td><span class="cmd-when">Короткие мысли и thread-цепочки. Адаптация TG-постов под Meta.</span></td>
+      </tr>
+      <tr class="cmd-row" data-cat="content">
+        <td><span class="cmd-badge">/ig-caption</span></td>
+        <td><span class="cat-tag content">Контент</span></td>
+        <td><span class="cmd-desc">Подписи для Instagram</span></td>
+        <td><span class="cmd-when">Фото-посты и Reels. Хук ≤125 символов + хэштеги.</span></td>
+      </tr>
+      <tr class="cmd-row" data-cat="content">
+        <td><span class="cmd-badge">/tg-carousel</span></td>
+        <td><span class="cat-tag content">Контент</span></td>
+        <td><span class="cmd-desc">Telegram-карусели</span></td>
+        <td><span class="cmd-when">Визуальные слайды с текстом в дизайн-системе Дмитрия.</span></td>
+      </tr>
+      <tr class="cmd-row" data-cat="design">
+        <td><span class="cmd-badge">/frontend-design</span></td>
+        <td><span class="cat-tag design">Дизайн</span></td>
+        <td><span class="cmd-desc">Сайты в дизайн-системе</span></td>
+        <td><span class="cmd-when">Space Grotesk, #d8fb03, sharp edges, editorial. Стиль Дмитрия.</span></td>
+      </tr>
+      <tr class="cmd-row" data-cat="design">
+        <td><span class="cmd-badge">/frontend-design-pro</span></td>
+        <td><span class="cat-tag design">Дизайн</span></td>
+        <td><span class="cmd-desc">Креативные сайты</span></td>
+        <td><span class="cmd-when">Уникальный дизайн, анимации, нестандартный лейаут. Без ограничений.</span></td>
+      </tr>
+      <tr class="cmd-row" data-cat="design">
+        <td><span class="cmd-badge">/ui-ux-pro-max</span></td>
+        <td><span class="cat-tag design">Дизайн</span></td>
+        <td><span class="cmd-desc">UI/UX аудит страниц</span></td>
+        <td><span class="cmd-when">Проверка и улучшение существующих страниц. Конкретные фиксы.</span></td>
+      </tr>
+      <tr class="cmd-row" data-cat="context">
+        <td><span class="cmd-badge">/style-guide</span></td>
+        <td><span class="cat-tag context">Контекст</span></td>
+        <td><span class="cmd-desc">Голос и стиль Дмитрия</span></td>
+        <td><span class="cmd-when">Основа для всего контента. Запрещённые фразы, примеры реальных постов.</span></td>
+      </tr>
+      <tr class="cmd-row" data-cat="context">
+        <td><span class="cmd-badge">/dmitry-context</span></td>
+        <td><span class="cat-tag context">Контекст</span></td>
+        <td><span class="cmd-desc">Полный контекст о проектах</span></td>
+        <td><span class="cmd-when">Справка о целях, ЦА, проектах: 100 дней AI, Anna Travel, Контент-завод.</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- MOBILE CARDS -->
+  <div class="cmd-cards">
+    <div class="cmd-card" data-cat="content">
+      <div class="card-top">
+        <span class="cmd-badge">/tg-post</span>
+        <span class="cat-tag content">Контент</span>
+      </div>
+      <div class="card-desc">Посты для Телеграм</div>
+      <div class="card-when">Ежедневный дневник, анонсы, кейсы. Два режима: короткий и длинный.</div>
+    </div>
+    <div class="cmd-card" data-cat="content">
+      <div class="card-top">
+        <span class="cmd-badge">/threads-post</span>
+        <span class="cat-tag content">Контент</span>
+      </div>
+      <div class="card-desc">Посты для Threads</div>
+      <div class="card-when">Короткие мысли и thread-цепочки. Адаптация TG-постов под Meta.</div>
+    </div>
+    <div class="cmd-card" data-cat="content">
+      <div class="card-top">
+        <span class="cmd-badge">/ig-caption</span>
+        <span class="cat-tag content">Контент</span>
+      </div>
+      <div class="card-desc">Подписи для Instagram</div>
+      <div class="card-when">Фото-посты и Reels. Хук ≤125 символов + хэштеги.</div>
+    </div>
+    <div class="cmd-card" data-cat="content">
+      <div class="card-top">
+        <span class="cmd-badge">/tg-carousel</span>
+        <span class="cat-tag content">Контент</span>
+      </div>
+      <div class="card-desc">Telegram-карусели</div>
+      <div class="card-when">Визуальные слайды с текстом в дизайн-системе Дмитрия.</div>
+    </div>
+    <div class="cmd-card" data-cat="design">
+      <div class="card-top">
+        <span class="cmd-badge">/frontend-design</span>
+        <span class="cat-tag design">Дизайн</span>
+      </div>
+      <div class="card-desc">Сайты в дизайн-системе</div>
+      <div class="card-when">Space Grotesk, #d8fb03, sharp edges, editorial. Стиль Дмитрия.</div>
+    </div>
+    <div class="cmd-card" data-cat="design">
+      <div class="card-top">
+        <span class="cmd-badge">/frontend-design-pro</span>
+        <span class="cat-tag design">Дизайн</span>
+      </div>
+      <div class="card-desc">Креативные сайты</div>
+      <div class="card-when">Уникальный дизайн, анимации, нестандартный лейаут. Без ограничений.</div>
+    </div>
+    <div class="cmd-card" data-cat="design">
+      <div class="card-top">
+        <span class="cmd-badge">/ui-ux-pro-max</span>
+        <span class="cat-tag design">Дизайн</span>
+      </div>
+      <div class="card-desc">UI/UX аудит страниц</div>
+      <div class="card-when">Проверка и улучшение существующих страниц. Конкретные фиксы.</div>
+    </div>
+    <div class="cmd-card" data-cat="context">
+      <div class="card-top">
+        <span class="cmd-badge">/style-guide</span>
+        <span class="cat-tag context">Контекст</span>
+      </div>
+      <div class="card-desc">Голос и стиль Дмитрия</div>
+      <div class="card-when">Основа для всего контента. Запрещённые фразы, примеры реальных постов.</div>
+    </div>
+    <div class="cmd-card" data-cat="context">
+      <div class="card-top">
+        <span class="cmd-badge">/dmitry-context</span>
+        <span class="cat-tag context">Контекст</span>
+      </div>
+      <div class="card-desc">Полный контекст о проектах</div>
+      <div class="card-when">Справка о целях, ЦА, проектах: 100 дней AI, Anna Travel, Контент-завод.</div>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <div class="footer-brand">Дмитрий <span>Лукин</span></div>
+  <div class="footer-meta">
+    100 ДНЕЙ AI // МАЙ 2026<br>
+    lukinmiami-max.github.io/100-days-ai
+  </div>
+</footer>
+
+<script>
+// Filter
+const btns = document.querySelectorAll('.filter-btn');
+const rows = document.querySelectorAll('.cmd-row, .cmd-card');
+const countEl = document.getElementById('cmdCount');
+
+btns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    btns.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    const filter = btn.dataset.filter;
+    let visible = 0;
+
+    rows.forEach(row => {
+      const match = filter === 'all' || row.dataset.cat === filter;
+      row.classList.toggle('hidden', !match);
+      if (match) visible++;
+    });
+
+    // Count unique commands (table + cards both render same items)
+    countEl.textContent = Math.round(visible / 2);
+  });
+});
+</script>
+
+</body>
+</html>
