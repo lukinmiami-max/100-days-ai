@@ -40,6 +40,9 @@ body { font-family: 'Space Grotesk', Arial, sans-serif; background: var(--black)
 .progress-count { font-size: 13px; font-weight: 600; color: var(--accent); white-space: nowrap; }
 .reset-btn { font-size: 11px; color: var(--gray-3); background: none; border: 1px solid #333; padding: 5px 12px; cursor: pointer; font-family: inherit; letter-spacing: 1px; text-transform: uppercase; transition: all 0.15s; }
 .reset-btn:hover { border-color: #666; color: var(--gray-2); }
+.header-nav { display: flex; align-items: center; gap: 24px; }
+.header-nav-link { font-size: 12px; font-weight: 500; letter-spacing: 1px; text-transform: uppercase; color: var(--gray-2); text-decoration: none; transition: color 0.2s; }
+.header-nav-link:hover { color: var(--accent); }
 
 /* LAYOUT */
 .layout { display: flex; height: calc(100vh - 57px); }
@@ -198,6 +201,7 @@ body { font-family: 'Space Grotesk', Arial, sans-serif; background: var(--black)
   .header-right { gap: 12px; }
   .progress-bar-wrap { width: 80px; }
   .reset-btn { display: none; }
+  .header-nav { display: none; }
   .layout { height: auto; flex-direction: column; }
   .sidebar { display: none; width: 100%; height: auto; max-height: none; border-right: none; border-bottom: 1px solid var(--border); }
   .main { overflow: visible; }
@@ -218,6 +222,10 @@ body { font-family: 'Space Grotesk', Arial, sans-serif; background: var(--black)
 
 <header class="header">
   <div class="logo">100 дней <span>AI</span></div>
+  <div class="header-nav">
+    <a href="roadmap.html" class="header-nav-link">Roadmap</a>
+    <a href="commands.html" class="header-nav-link">Команды</a>
+  </div>
   <div class="header-right">
     <div class="progress-wrap">
       <span class="progress-label">Пройдено</span>
