@@ -191,6 +191,52 @@ body { font-family: 'Space Grotesk', Arial, sans-serif; background: var(--black)
 .btn-prev:hover, .btn-next:hover { border-color: #666; color: var(--white); }
 .btn-prev:disabled, .btn-next:disabled { opacity: 0.2; cursor: not-allowed; }
 
+/* NOTES */
+.notes-block {
+  border: 1px solid var(--border2);
+  background: #0d0d0d;
+  padding: 24px 28px;
+  margin-bottom: 24px;
+}
+.notes-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+.notes-saved-badge { font-size: 11px; color: var(--green); letter-spacing: 1px; opacity: 0; transition: opacity 0.3s; }
+.notes-saved-badge.visible { opacity: 1; }
+.notes-textarea {
+  width: 100%;
+  min-height: 110px;
+  resize: vertical;
+  background: #111;
+  border: 1px solid #2a2a2a;
+  color: var(--white);
+  font-family: 'Space Grotesk', Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.65;
+  padding: 14px 16px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.notes-textarea:focus { border-color: #444; }
+.notes-textarea::placeholder { color: #444; }
+.notes-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; }
+.notes-counter { font-size: 12px; color: var(--gray-2); }
+.notes-counter.near-limit { color: #f59e0b; }
+.notes-counter.at-limit { color: #ef4444; }
+.notes-preview {
+  margin-top: 12px;
+  padding: 14px 16px;
+  border: 1px solid #1e1e1e;
+  background: #0a0a0a;
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--gray-2);
+  white-space: pre-wrap;
+  word-break: break-word;
+  display: none;
+}
+.notes-preview a { color: var(--accent); text-decoration: none; border-bottom: 1px solid rgba(216,251,3,0.3); }
+.notes-preview a:hover { border-bottom-color: var(--accent); }
+.notes-preview-label { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: #333; margin-bottom: 6px; }
+
 /* MOBILE */
 .sidebar-toggle { display: none; background: #1a1a1a; border: 1px solid #333; color: var(--white); padding: 8px 16px; font-family: inherit; font-size: 12px; cursor: pointer; letter-spacing: 1px; text-transform: uppercase; }
 .mobile-sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 150; }
@@ -1448,6 +1494,29 @@ function openLesson(id) {
     </div>
   ` : '';
 
+  const savedNote = getNotes(id);
+  const notesHtml = `
+    <div class="notes-block">
+      <div class="notes-header">
+        <div class="section-label" style="margin-bottom:0">Мои заметки</div>
+        <span class="notes-saved-badge" id="notesSavedBadge">СОХРАНЕНО</span>
+      </div>
+      <textarea
+        class="notes-textarea"
+        id="notesTextarea"
+        maxlength="5000"
+        placeholder="Напиши что изучал, вставь ссылку на видео, запиши что получилось…"
+      >${savedNote}</textarea>
+      <div class="notes-footer">
+        <span class="notes-counter" id="notesCounter">${savedNote.length} / 5000</span>
+      </div>
+      <div id="notesPreviewWrap" style="display:${savedNote.trim() ? 'block' : 'none'}">
+        <div class="notes-preview-label">Превью</div>
+        <div class="notes-preview" id="notesPreview">${linkify(savedNote)}</div>
+      </div>
+    </div>
+  `;
+
   const main = document.getElementById('main');
   main.innerHTML = `
     <div class="lesson-view">
@@ -1461,6 +1530,7 @@ function openLesson(id) {
       </div>
       <div class="steps">${stepsHtml}</div>
       ${resourcesHtml}
+      ${notesHtml}
       <div class="blog-block">
         <div class="blog-eyebrow">📝 Пост в блог</div>
         <div class="blog-post-title">"${lesson.blog}"</div>
@@ -1475,6 +1545,50 @@ function openLesson(id) {
     </div>
   `;
   main.scrollTop = 0;
+
+  // Notes logic — after render
+  const ta = document.getElementById('notesTextarea');
+  const counter = document.getElementById('notesCounter');
+  const badge = document.getElementById('notesSavedBadge');
+  let saveTimer = null;
+
+  const previewWrap = document.getElementById('notesPreviewWrap');
+  const preview = document.getElementById('notesPreview');
+
+  if (ta) {
+    ta.addEventListener('input', () => {
+      const len = ta.value.length;
+      counter.textContent = len + ' / 5000';
+      counter.className = 'notes-counter' + (len >= 5000 ? ' at-limit' : len >= 4500 ? ' near-limit' : '');
+      // Update preview
+      if (ta.value.trim()) {
+        previewWrap.style.display = 'block';
+        preview.innerHTML = linkify(ta.value);
+      } else {
+        previewWrap.style.display = 'none';
+      }
+      badge.classList.remove('visible');
+      clearTimeout(saveTimer);
+      saveTimer = setTimeout(() => {
+        saveNotes(id, ta.value);
+        badge.classList.add('visible');
+        setTimeout(() => badge.classList.remove('visible'), 2000);
+      }, 800);
+    });
+  }
+}
+
+function linkify(text) {
+  const escaped = text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  return escaped.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" rel="noopener">$1</a>');
+}
+
+function getNotes(id) {
+  return localStorage.getItem('notes_' + id) || '';
+}
+
+function saveNotes(id, text) {
+  localStorage.setItem('notes_' + id, text);
 }
 
 // Init
