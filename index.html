@@ -43,6 +43,8 @@ body { font-family: 'Space Grotesk', Arial, sans-serif; background: var(--black)
 .header-nav { display: flex; align-items: center; gap: 8px; }
 .header-nav-link { font-size: 11px; font-weight: 500; letter-spacing: 1px; text-transform: uppercase; color: var(--gray-2); text-decoration: none; transition: color 0.2s; padding: 6px 14px; border: 1px solid #2a2a2a; }
 .header-nav-link:hover { color: var(--accent); border-color: #444; }
+.header-nav-link--quiz { color: var(--accent); border-color: #4a5a00; }
+.header-nav-link--quiz:hover { background: var(--accent); color: var(--black); border-color: var(--accent); }
 
 /* LAYOUT */
 .layout { display: flex; height: calc(100vh - 57px); }
@@ -270,6 +272,7 @@ body { font-family: 'Space Grotesk', Arial, sans-serif; background: var(--black)
   <div class="header-nav">
     <a href="roadmap.html" class="header-nav-link">Roadmap</a>
     <a href="commands.html" class="header-nav-link">Команды</a>
+    <a href="../quiz-site/index.html" class="header-nav-link header-nav-link--quiz">Тест дня ✦</a>
   </div>
   <div class="header-right">
     <div class="progress-wrap">
