@@ -961,11 +961,18 @@ const dayMap = {
   90:18, 91:18, 92:18, 93:18, 94:18, 95:18, 96:18, 97:18, 98:18, 99:18, 100:18
 };
 
+const lessonToDay = {
+  1:1,  2:3,  3:5,  4:8,  5:11, 6:14, 7:17, 8:21, 9:24, 10:27,
+  11:30, 12:33, 13:36, 14:41, 15:44, 16:47, 17:50, 18:53, 19:56, 20:61,
+  21:64, 22:67, 23:70, 24:73, 25:76, 26:81, 27:84, 28:87, 29:90, 30:93, 31:96, 32:100
+};
+
 function getTodayDay() {
-  const start = new Date('2026-05-11');
-  const today = new Date();
-  const diff = Math.floor((today - start) / (1000 * 60 * 60 * 24)) + 1;
-  return Math.min(Math.max(diff, 1), 100);
+  const currProgress = JSON.parse(localStorage.getItem('curriculum_progress') || '{}');
+  const completed = Object.keys(currProgress).filter(k => currProgress[k]).map(Number);
+  if (completed.length === 0) return 1;
+  const maxLesson = Math.max(...completed);
+  return lessonToDay[maxLesson] || 1;
 }
 
 function getStreak() {
